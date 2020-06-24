@@ -1,0 +1,5 @@
+django==3.0.7
+channels==2.4.0
+django-cpffield== 0.1.1
+django-phone-field==1.8.1
+Pillow==7.0.0
