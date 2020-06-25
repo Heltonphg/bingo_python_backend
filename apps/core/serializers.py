@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.core.models import Event, Room
+from apps.users.serializers import UserSerializer
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -9,9 +10,10 @@ class EventSerializer(serializers.ModelSerializer):
 
 class RoomSerializer(serializers.ModelSerializer):
     event = EventSerializer()
+    users = UserSerializer(many=True, required=False)
     class Meta:
         model = Room
-        fields = ['id','event', 'type',
+        fields = ['id','event', 'users', 'type',
                   'premium_price', 'initiation_game',
                   'minumum_quantity',
                   'created_at',
