@@ -1,1 +1,1 @@
-# bingo_puthon_backend
+# bingo_python_backend
