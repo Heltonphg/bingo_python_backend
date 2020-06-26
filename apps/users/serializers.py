@@ -15,11 +15,13 @@ class UserSerializer(serializers.ModelSerializer):
             'sex', 'avatar', 'created_at', 'updated_at')
 
     def get_cards(self, instance):
-        retorno = {
-            "teste": instance.email
+        retorno = instance.cards.get(user_id=instance.id, is_activate=True)
+        data = {
+            'id': retorno.id,
+            'price': retorno.price,
+            'type': retorno.type
         }
-        return retorno
-        # instance.cards.filllter(is_activate=True)
+        return data
 
 
 class CardBingoSerializer(serializers.ModelSerializer):
