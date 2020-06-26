@@ -1,11 +1,12 @@
+import jsonfield
 from django.db import models
 from cpffield import cpffield
 
 
 class User(models.Model):
     SEX = [
-        ("M", "Male"),
-        ("F", "Female")
+        ("M", "Masculino"),
+        ("F", "Feminino")
     ]
     email = models.EmailField()
     password = models.CharField(max_length=45)
@@ -21,3 +22,18 @@ class User(models.Model):
 
     def __str__(self):
         return self.full_name
+
+
+class CardBingo(models.Model):
+    TYPES = [
+        ("V", "Vip"),
+        ("G", "Gratis")
+    ]
+    user = models.ForeignKey(User, related_name="cards", on_delete=models.CASCADE)
+    card = jsonfield.JSONField()
+    is_activate = models.BooleanField(default=False)
+    price = models.FloatField()
+    type = models.CharField(max_length=1, choices=TYPES)
+
+    def __str__(self):
+        return "{} - {}".format(self.user.full_name, self.type)

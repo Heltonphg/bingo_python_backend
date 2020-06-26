@@ -4,7 +4,8 @@ from rest_framework.response import Response
 
 from apps.core.models import Event, Room
 from apps.core.serializers import EventSerializer, RoomSerializer
-from apps.users.models import User
+from apps.users.models import User, CardBingo
+from apps.users.serializers import CardBingoSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -30,14 +31,14 @@ class EventViewSet(viewsets.ModelViewSet):
             if i == 1:
                 vip = {
                     'event_id': event_id,
-                    'type': "Vip",
+                    'type': "V",
                     'minumum_quantity': 10,
                 }
                 self.criar_sala(vip)
             else:
                 gratis = {
                     'event_id': event_id,
-                    'type': "Grátis",
+                    'type': "G",
                     'minumum_quantity': 5,
                 }
                 self.criar_sala(gratis)
@@ -49,11 +50,12 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
-        user = self.request.data.get('user')
-        if (user):
-            room = Room.objects.get(id=pk)
-            room.users.add(User.objects.get(id=user))
+        user = User.objects.get(id=self.request.data.get('user'))
+        card = CardBingo.objects.get(user_id=user.pk, is_activate=True)
+        room = Room.objects.get(id=pk)
+        if card.type == room.type and card.is_activate and card.price > 0:
+            room.users.add(user)
             serializer = RoomSerializer(instance=room).data
             return Response(serializer, status=status.HTTP_201_CREATED)
         else:
-            return Response("Usuário não existe", status=status.HTTP_204_NO_CONTENT)
+            return Response({'Error': {'message': "Ops, Você não tem permissão para entrar nessa sala!"}}, status=status.HTTP_401_UNAUTHORIZED)

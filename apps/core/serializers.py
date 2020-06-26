@@ -18,7 +18,7 @@ class RoomSerializer(serializers.ModelSerializer):
                   )
 
     def get_event(self, instance):
-        return instance.event.name
+        return "{} ({})".format(instance.event.name, instance.type)
 
 
 class EventSerializer(serializers.ModelSerializer):
