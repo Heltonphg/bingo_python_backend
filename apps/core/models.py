@@ -12,11 +12,11 @@ class Event(models.Model):
         return self.name
 
 class Room(models.Model):
-    event = models.ForeignKey(Event, related_name="roons", on_delete=models.CASCADE)
-    users = models.ManyToManyField(User, related_name="roons", blank=True)
+    event = models.ForeignKey(Event, related_name="roons", on_delete=models.CASCADE, blank=True, null=True)
+    users = models.ManyToManyField(User, related_name="roons", blank=True, null=True)
     type = models.CharField(max_length=45)
-    premium_price = models.FloatField()
-    initiation_game = models.DateTimeField()
+    premium_price = models.FloatField(default=0)
+    initiation_game = models.DateTimeField(blank=True, null=True)
     minumum_quantity = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
