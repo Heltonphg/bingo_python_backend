@@ -5,6 +5,7 @@ from apps.users.models import User
 
 class Event(models.Model):
     name = models.CharField(max_length=150)
+    time_initiation = models.DateTimeField()
     is_activated = models.BooleanField(default=True)
 
     def __str__(self):
@@ -15,7 +16,7 @@ class Room(models.Model):
     users = models.ManyToManyField(User, related_name="roons", blank=True)
     type = models.CharField(max_length=45)
     premium_price = models.FloatField()
-    initiation_game = models.DateField()
+    initiation_game = models.DateTimeField()
     minumum_quantity = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

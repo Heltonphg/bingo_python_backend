@@ -1,5 +1,8 @@
-from channels.routing import ProtocolTypeRouter
+from channels.routing import ProtocolTypeRouter,URLRouter
+from django.conf.urls import url
 
 application = ProtocolTypeRouter({
-    # Empty for now (http->django views is added by default)
+    # "websocket": URLRouter([
+    #     url(r'auth/(?P<room_id>\w+)/$', AuthConsumer),
+    # ])
 })
