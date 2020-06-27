@@ -11,7 +11,7 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ('id', 'event', 'users', 'type',
-                  'premium_price', 'initiation_game',
+                  'premium_price','value_card', 'initiation_game',
                   'minumum_quantity',
                   'created_at',
                   'updated_at'
