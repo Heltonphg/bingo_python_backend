@@ -30,10 +30,11 @@ class CardBingo(models.Model):
         ("G", "Gratis")
     ]
     user = models.ForeignKey(User, related_name="cards", on_delete=models.CASCADE)
+    room = models.ForeignKey(to='core.Room', related_name="cards", on_delete=models.SET_NULL, blank=True, null=True)
     card = jsonfield.JSONField()
     is_activate = models.BooleanField(default=False)
     price = models.FloatField()
-    type = models.CharField(max_length=1, choices=TYPES)
+
 
     def __str__(self):
-        return "{} - {}".format(self.user.full_name, self.type)
+        return "{}".format(self.user.full_name)

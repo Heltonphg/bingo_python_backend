@@ -76,7 +76,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         user = User.objects.get(id=self.request.data.get('user'))
         card = CardBingo.objects.get(user_id=user.pk, is_activate=True)
         room = Room.objects.get(id=pk)
-        if card.type == room.type and card.is_activate:
+        if card.is_activate and room.pk == card.room_id:
             room.users.add(user)
             serializer = RoomSerializer(instance=room).data
             return Response(serializer, status=status.HTTP_201_CREATED)

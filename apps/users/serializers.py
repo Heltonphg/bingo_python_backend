@@ -20,9 +20,9 @@ class UserSerializer(serializers.ModelSerializer):
             if retorno:
                 data = [
                     {
-                    'id': retorno.id,
-                    'price': retorno.price,
-                    'type': retorno.type
+                        'id': retorno.id,
+                        'price': retorno.price,
+                        'room_id': retorno.room.pk
                     }
                 ]
                 return data
@@ -37,5 +37,5 @@ class CardBingoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CardBingo
         fields = (
-            'user', 'card', 'is_activate', 'price', 'type'
+            'user', 'card', 'is_activate', 'price'
         )
