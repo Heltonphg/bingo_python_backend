@@ -17,15 +17,15 @@ class UserSerializer(serializers.ModelSerializer):
     def get_cards(self, instance):
         try:
             retorno = instance.cards.get(user_id=instance.id, is_activate=True)
-            if retorno:
-                data = [
-                    {
-                        'id': retorno.id,
-                        'price': retorno.price,
-                        'room_id': retorno.room.pk
-                    }
-                ]
-                return data
+            data = [
+                {
+                    'id': retorno.id,
+                    'price': retorno.price,
+                    'room_id': retorno.room.pk
+                }
+            ]
+            return data
+
         except:
             return None
 

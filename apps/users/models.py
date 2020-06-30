@@ -35,6 +35,5 @@ class CardBingo(models.Model):
     is_activate = models.BooleanField(default=False)
     price = models.FloatField()
 
-
     def __str__(self):
         return "{}".format(self.user.full_name)

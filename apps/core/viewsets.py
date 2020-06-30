@@ -1,70 +1,73 @@
+from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.core.models import Event, Room
-from apps.core.serializers import EventSerializer, RoomSerializer
+from apps.core.models import Bingo, Room
+from apps.core.serializers import BingoSerializer, RoomSerializer
 from apps.users.models import User, CardBingo
-from datetime import datetime, date
-from apps.users.serializers import CardBingoSerializer
+from datetime import datetime
 
 
-class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
+class BingoViewSet(viewsets.ModelViewSet):
+    queryset = Bingo.objects.all()
+    serializer_class = BingoSerializer
 
     @action(methods=['post'], detail=False)
-    def cadastrar_evento(self, request):
+    def cadastrar_bingo(self, request):
         hoje = datetime.now()
         hora = hoje.hour
-        name_event = 'Bindo '
+        name_bingo = 'Bindo '
         if hora >= 0 and hora < 6:
-            name_event += 'da Madrugada'
+            name_bingo += 'da Madrugada'
         elif hora >= 6 and hora < 12:
-            name_event += 'da Manhã'
+            name_bingo += 'da Manhã'
         elif hora >= 12 and hora < 13:
-            name_event += 'do Meio-Dia'
+            name_bingo += 'do Meio-Dia'
         elif hora >= 13 and hora < 18:
-            name_event += 'da Tarde'
+            name_bingo += 'da Tarde'
         elif hora >= 18 and hora < 24:
-            name_event += 'da Noite'
+            name_bingo += 'da Noite'
 
-        data = {
-            'name': name_event,
+        bingo = {
+            'name': name_bingo,
             'time_initiation': hoje
         }
 
-        serializer = EventSerializer(data=data)
+        serializer = BingoSerializer(data=bingo)
         if serializer.is_valid():
-            serializer.save()
-            self.create_two_room(serializer.data['id'])
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                with transaction.atomic():
+                    serializer.save()
+                    self.create_two_room(serializer.data['id'])
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def criar_sala(self, room):
-        price = room['value_card']
+    def criar_bingo(self, room):
         Room.objects.create(
-            event_id=room['event_id'], minumum_quantity=room['minumum_quantity'], type=room['type'], value_card=price
+            bingo_id=room['bingo_id'], minumum_quantity=room['minumum_quantity'], type=room['type'],
+            value_card=room['value_card']
         )
 
-    def create_two_room(self, event_id):
+    def create_two_room(self, bingo_id):
         for i in range(1, 3):
             if i == 1:
                 vip = {
-                    'event_id': event_id,
+                    'bingo_id': bingo_id,
                     'type': "V",
                     'value_card': 2,
                     'minumum_quantity': 15,
                 }
-                self.criar_sala(vip)
+                self.criar_bingo(vip)
             else:
                 gratis = {
-                    'event_id': event_id,
+                    'bingo_id': bingo_id,
                     'type': "G",
                     'value_card': 0,
                     'minumum_quantity': 10,
                 }
-                self.criar_sala(gratis)
+                self.criar_bingo(gratis)
 
 
 class RoomViewSet(viewsets.ModelViewSet):
@@ -76,7 +79,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         user = User.objects.get(id=self.request.data.get('user'))
         card = CardBingo.objects.get(user_id=user.pk, is_activate=True)
         room = Room.objects.get(id=pk)
-        if card.is_activate and room.pk == card.room_id:
+        if room.is_pode_entrar(card=card):
             room.users.add(user)
             serializer = RoomSerializer(instance=room).data
             return Response(serializer, status=status.HTTP_201_CREATED)
