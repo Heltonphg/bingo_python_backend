@@ -25,10 +25,6 @@ class User(models.Model):
 
 
 class CardBingo(models.Model):
-    TYPES = [
-        ("V", "Vip"),
-        ("G", "Gratis")
-    ]
     user = models.ForeignKey(User, related_name="cards", on_delete=models.CASCADE)
     room = models.ForeignKey(to='core.Room', related_name="cards", on_delete=models.SET_NULL, blank=True, null=True)
     card = jsonfield.JSONField()

@@ -29,45 +29,13 @@ class BingoViewSet(viewsets.ModelViewSet):
         elif hora >= 18 and hora < 24:
             name_bingo += 'da Noite'
 
-        bingo = {
+        serializer = BingoSerializer(data={
             'name': name_bingo,
             'time_initiation': hoje
-        }
-
-        serializer = BingoSerializer(data=bingo)
-        if serializer.is_valid():
-            try:
-                with transaction.atomic():
-                    serializer.save()
-                    self.create_two_room(serializer.data['id'])
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def criar_bingo(self, room):
-        Room.objects.create(
-            bingo_id=room['bingo_id'], minumum_quantity=room['minumum_quantity'], type=room['type'],
-            value_card=room['value_card']
-        )
-
-    def create_two_room(self, bingo_id):
-        for i in range(1, 3):
-            if i == 1:
-                vip = {
-                    'bingo_id': bingo_id,
-                    'type': "V",
-                    'value_card': 2,
-                    'minumum_quantity': 15,
-                }
-                self.criar_bingo(vip)
-            else:
-                gratis = {
-                    'bingo_id': bingo_id,
-                    'type': "G",
-                    'value_card': 0,
-                    'minumum_quantity': 10,
-                }
-                self.criar_bingo(gratis)
+        })
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class RoomViewSet(viewsets.ModelViewSet):
