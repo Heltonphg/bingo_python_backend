@@ -19,6 +19,7 @@ class Bingo(models.Model):
                 Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='G', value_card=0)
 
 
+
     def __str__(self):
         return '{} - {}'.format(self.name, self.time_initiation.strftime('%b/%d/%Y (%A) as %H:%M:%S '))
 

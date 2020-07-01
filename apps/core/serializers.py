@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from api.serializers import PrimaryKeyNestedMixin
 from apps.core.models import Bingo, Room
 from apps.users.serializers import UserSerializer
 
@@ -21,9 +22,12 @@ class RoomSerializer(serializers.ModelSerializer):
         return "{} ({})".format(instance.bingo.name, instance.type)
 
 
-class BingoSerializer(serializers.ModelSerializer):
-    rooms = RoomSerializer(many=True, read_only=True, required=False)
 
+class BingoSerializer(serializers.ModelSerializer):
+    rooms = RoomSerializer(many=True, read_only=False, required=False)
     class Meta:
         model = Bingo
         fields = ('id', 'name', 'rooms', 'time_initiation', 'is_activated')
+
+
+
