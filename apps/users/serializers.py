@@ -1,6 +1,12 @@
 from rest_framework import serializers
-
+from rest_framework_jwt.settings import api_settings
 from apps.users.models import User, CardBingo
+
+
+class UserSerializerSimple(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('full_name','email')
 
 
 class UserSerializer(serializers.ModelSerializer):

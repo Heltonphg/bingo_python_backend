@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,6 +11,13 @@ from datetime import datetime
 class BingoViewSet(viewsets.ModelViewSet):
     queryset = Bingo.objects.all()
     serializer_class = BingoSerializer
+
+    @action(methods=['GET'], detail=False)
+    def buscar_bingo_ativo(self, request):
+        bingo = Bingo.objects.filter(is_activated=True).first()
+        serializer = BingoSerializer(instance=bingo).data
+        return Response(serializer, status=status.HTTP_200_OK)
+
 
     @action(methods=['post'], detail=False)
     def cadastrar_bingo(self, request):

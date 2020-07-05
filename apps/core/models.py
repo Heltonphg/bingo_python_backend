@@ -15,8 +15,8 @@ class Bingo(models.Model):
         else:
             with transaction.atomic():
                 super(Bingo, self).save(*args, **kwargs)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='V', value_card=2)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='G', value_card=0)
+                Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='Vip', value_card=2)
+                Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='Grátis', value_card=0)
 
 
 
@@ -26,12 +26,12 @@ class Bingo(models.Model):
 
 class Room(models.Model):
     TYPES = [
-        ("V", "Vip"),
-        ("G", "Gratis")
+        ("Vip", "Vip"),
+        ("Grátis", "Grátis")
     ]
     bingo = models.ForeignKey(to='Bingo', related_name="rooms", on_delete=models.CASCADE, blank=True, null=True)
     users = models.ManyToManyField(User, related_name="rooms", blank=True, default=list)
-    type = models.CharField(max_length=1, choices=TYPES)
+    type = models.CharField(max_length=10, choices=TYPES)
     premium_price = models.FloatField(default=0)
     minumum_quantity = models.IntegerField()
     initiation_game = models.DateTimeField(blank=True, null=True)
