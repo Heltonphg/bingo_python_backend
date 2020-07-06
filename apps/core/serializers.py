@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from api.serializers import PrimaryKeyNestedMixin
+from apps.auth_user.serializers import UserAuthSerializer
 from apps.core.models import Bingo, Room
-from apps.users.serializers import UserSerializer
+
 
 
 class RoomSerializer(serializers.ModelSerializer):
     bingo = serializers.SerializerMethodField()
-    users = UserSerializer(many=True)
+    users = UserAuthSerializer(many=True)
 
     class Meta:
         model = Room

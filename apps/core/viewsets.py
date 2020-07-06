@@ -1,14 +1,22 @@
 from rest_framework import viewsets, status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.auth_user.models import User
+from apps.card.models import CardBingo
 from apps.core.models import Bingo, Room
 from apps.core.serializers import BingoSerializer, RoomSerializer
-from apps.users.models import User, CardBingo
+
 from datetime import datetime
 
 
 class BingoViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
     queryset = Bingo.objects.all()
     serializer_class = BingoSerializer
 

@@ -25,9 +25,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'cpffield',
     'rest_framework',
+    'rest_framework.authtoken',
     'channels',
     'apps.core',
-    'apps.users'
+    'apps.card',
+    'apps.auth_user'
 ]
 
 MIDDLEWARE = [
@@ -42,6 +44,20 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'bingo_backend.urls'
+
+AUTH_USER_MODEL = 'auth_user.User'
+
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'apps.auth_user.utils.my_jwt_response_handler'
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
 
 TEMPLATES = [
     {

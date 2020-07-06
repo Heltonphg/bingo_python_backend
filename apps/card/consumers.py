@@ -3,7 +3,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from apps.users.models import User
+from apps.auth_user.models import User
 
 
 class AppConsumer(WebsocketConsumer):

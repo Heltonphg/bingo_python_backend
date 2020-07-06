@@ -1,8 +1,6 @@
 from django.db import models, transaction
 from rest_framework import serializers
 
-from apps.users.models import User
-
 
 class Bingo(models.Model):
     name = models.CharField(max_length=150)
@@ -30,7 +28,7 @@ class Room(models.Model):
         ("Grátis", "Grátis")
     ]
     bingo = models.ForeignKey(to='Bingo', related_name="rooms", on_delete=models.CASCADE, blank=True, null=True)
-    users = models.ManyToManyField(User, related_name="rooms", blank=True, default=list)
+    users = models.ManyToManyField(to='auth_user.User', related_name="rooms", blank=True, default=list)
     type = models.CharField(max_length=10, choices=TYPES)
     premium_price = models.FloatField(default=0)
     minumum_quantity = models.IntegerField()

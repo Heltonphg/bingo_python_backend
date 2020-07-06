@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.core.models import Room
-from apps.core.serializers import BingoSerializer, BingoSerializerLer
 
 
 class BingoAPITest(APITestCase):
