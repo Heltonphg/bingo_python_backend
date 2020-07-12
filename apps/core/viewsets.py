@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -13,10 +13,6 @@ from datetime import datetime
 
 
 class BingoViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-
     queryset = Bingo.objects.all()
     serializer_class = BingoSerializer
 
@@ -58,11 +54,16 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
-        user = User.objects.get(id=self.request.data.get('user'))
-        card = CardBingo.objects.get(user_id=user.pk, is_activate=True)
-        room = Room.objects.get(id=pk)
+        try:
+            card = CardBingo.objects.get(user_id=request.user, is_activate=True)
+        except CardBingo.DoesNotExist:
+            raise serializers.ValidationError('O card nao existe')
+
+        room = Room.objects.filter(id=pk).first()
+        if not room:
+            raise serializers.ValidationError('A sala nao existe')
+
         if room.is_pode_entrar(card=card):
-            room.users.add(user)
             serializer = RoomSerializer(instance=room).data
             return Response(serializer, status=status.HTTP_201_CREATED)
         else:

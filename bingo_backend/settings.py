@@ -1,5 +1,7 @@
 import os
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
+import datetime
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -48,10 +50,14 @@ ROOT_URLCONF = 'bingo_backend.urls'
 AUTH_USER_MODEL = 'auth_user.User'
 
 JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=5),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'apps.auth_user.utils.my_jwt_response_handler'
 }
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',

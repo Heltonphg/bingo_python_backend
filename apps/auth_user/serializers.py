@@ -12,10 +12,13 @@ class UserAuthSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'password','email', 'full_name',
+        fields = ['id', 'email', 'full_name',
             'nick_name', 'cards',  'cpf',  'phone',
             'birth_date', 'sex', 'avatar',
         ]
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
     def get_cards(self, instance):
         try:
@@ -24,6 +27,7 @@ class UserAuthSerializer(serializers.ModelSerializer):
                 {
                     'id': retorno.id,
                     'price': retorno.price,
+                    'ativo': retorno.is_activate,
                     'room_id': retorno.room.pk
                 }
             ]

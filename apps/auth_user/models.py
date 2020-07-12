@@ -16,7 +16,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     full_name = models.CharField(max_length=144)
     nick_name = models.CharField(max_length=144)
-    cpf = cpffield.CPFField('CPF', max_length=14)
+    cpf = models.CharField('CPF', max_length=14)
     phone = models.CharField(max_length=22)
     birth_date = models.DateField(blank=True, null=True)
     sex = models.CharField(max_length=1, choices=SEX)
@@ -32,16 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def save(self, *args, **kwargs):
-        self.password = make_password(self.password)
-        super(User, self).save(*args, **kwargs)
-
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        '''
-        Sends an email to this User.
-        '''
-        send_mail(subject, message, from_email, [self.email], **kwargs)

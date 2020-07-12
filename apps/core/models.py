@@ -30,7 +30,6 @@ class Room(models.Model):
     bingo = models.ForeignKey(to='Bingo', related_name="rooms", on_delete=models.CASCADE, blank=True, null=True)
     users = models.ManyToManyField(to='auth_user.User', related_name="rooms", blank=True, default=list)
     type = models.CharField(max_length=10, choices=TYPES)
-    premium_price = models.FloatField(default=0)
     minumum_quantity = models.IntegerField()
     initiation_game = models.DateTimeField(blank=True, null=True)
     value_card = models.FloatField()
@@ -39,6 +38,16 @@ class Room(models.Model):
 
     def is_pode_entrar(self, card):
         return card.is_activate and self.id == card.room_id
+
+    @property
+    def valor_premio(self):
+        valor = 0
+        for users in self.users.all():
+            for card in users.cards.all():
+                if card.is_activate:
+                    valor += card.price
+        return valor
+
 
     def __str__(self):
         return self.type

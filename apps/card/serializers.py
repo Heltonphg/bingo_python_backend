@@ -1,15 +1,22 @@
 from rest_framework import serializers
 
-from apps.auth_user.serializers import UserAuthSerializer
+from api.serializers import PrimaryKeyNestedMixin
+from apps.auth_user.models import User
+from apps.auth_user.serializers import UserSimpleSerializer
 from apps.card.models import CardBingo
+from apps.core.models import Room
+from apps.core.serializers import RoomSerializer
 
 
 class CardBingoSerializer(serializers.ModelSerializer):
-    user = UserAuthSerializer(many=False)
+    room = PrimaryKeyNestedMixin(queryset=Room.objects.all(), serializer=RoomSerializer, required=False,
+                                  allow_empty=True, allow_null=True)
+    user = PrimaryKeyNestedMixin(queryset=User.objects.all(), serializer=UserSimpleSerializer, required=False,
+                                  allow_empty=True, allow_null=True)
     card = serializers.JSONField()
 
     class Meta:
         model = CardBingo
         fields = (
-            'user', 'card', 'is_activate', 'price'
+           'id', 'user', 'room', 'card', 'is_activate', 'price'
         )
