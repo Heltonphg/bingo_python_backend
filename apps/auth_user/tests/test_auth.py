@@ -38,7 +38,7 @@ class AuthAPITest(APITestCase):
             "sex": "M",
             "password": "123"
         }
-        response = self.client.post("/auth_user/cadastrar/", data)
+        response = self.client.post("/users/cadastrar/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_no_repeat_email(self):
@@ -51,7 +51,7 @@ class AuthAPITest(APITestCase):
             "sex": "M",
             "password": "123"
         }
-        response = self.client.post("/auth_user/cadastrar/", data)
+        response = self.client.post("/users/cadastrar/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         response = self._decode_response(response)
         self.assertEqual(response['email'][0], 'usuário com este endereço de email já existe.')

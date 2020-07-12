@@ -54,14 +54,13 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
-        try:
-            card = CardBingo.objects.get(user_id=request.user, is_activate=True)
-        except CardBingo.DoesNotExist:
-            raise serializers.ValidationError('O card nao existe')
+        card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
+        if not card:
+            raise serializers.ValidationError('Você precisa de uma cartela para entrar na sala.')
 
         room = Room.objects.filter(id=pk).first()
         if not room:
-            raise serializers.ValidationError('A sala nao existe')
+            raise serializers.ValidationError('A sala não existe.')
 
         if room.is_pode_entrar(card=card):
             serializer = RoomSerializer(instance=room).data

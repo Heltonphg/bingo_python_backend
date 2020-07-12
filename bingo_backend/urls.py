@@ -13,7 +13,7 @@ router = routers.DefaultRouter()
 router.register(r'bingos', BingoViewSet)
 router.register(r'rooms', RoomViewSet)
 router.register(r'cards', CardBingoViewSet)
-router.register(r'auth_user', UserAuthViewSet)
+router.register(r'users', UserAuthViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
