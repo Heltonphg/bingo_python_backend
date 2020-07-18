@@ -1,10 +1,7 @@
 from rest_framework import viewsets, status, serializers
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.auth_user.models import User
 from apps.card.models import CardBingo
 from apps.core.models import Bingo, Room
 from apps.core.serializers import BingoSerializer, RoomSerializer
@@ -59,10 +56,12 @@ class RoomViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError('Você precisa de uma cartela para entrar na sala.')
 
         room = Room.objects.filter(id=pk).first()
+
         if not room:
             raise serializers.ValidationError('A sala não existe.')
 
         if room.is_pode_entrar(card=card):
+            room.users.add(request.user)
             serializer = RoomSerializer(instance=room).data
             return Response(serializer, status=status.HTTP_201_CREATED)
         else:
