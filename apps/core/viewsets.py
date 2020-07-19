@@ -52,18 +52,24 @@ class RoomViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
-        if not card:
-            raise serializers.ValidationError('Você precisa de uma cartela para entrar na sala.')
-
         room = Room.objects.filter(id=pk).first()
 
         if not room:
-            raise serializers.ValidationError('A sala não existe.')
+            return Response({'error': {'message': "A sala não existe."}},
+                            status=status.HTTP_401_UNAUTHORIZED)
+
+        if not card and room.initiation_game == False:
+            return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
+                            status=status.HTTP_401_UNAUTHORIZED)
+
+        if not card == False and room.initiation_game == True:
+            return Response({'error': {'message': "O jogo já começou, aguarde a próxima rodada."}},
+                            status=status.HTTP_401_UNAUTHORIZED)
 
         if room.is_pode_entrar(card=card):
             room.users.add(request.user)
             serializer = RoomSerializer(instance=room).data
-            return Response(serializer, status=status.HTTP_201_CREATED)
+            return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
-            return Response({'Error': {'message': "Ops, Você não tem permissão para entrar nessa sala!"}},
+            return Response({'error': {'message': "Ops, Você não tem permissão para entrar nessa sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
