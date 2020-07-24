@@ -31,7 +31,7 @@ class Room(models.Model):
     users = models.ManyToManyField(to='auth_user.User', related_name="rooms", blank=True, default=list)
     type = models.CharField(max_length=10, choices=TYPES)
     minumum_quantity = models.IntegerField()
-    initiation_game = models.BooleanField(default=False)
+    game_iniciado = models.BooleanField(default=False)
     value_card = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

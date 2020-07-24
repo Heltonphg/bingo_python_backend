@@ -58,11 +58,11 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response({'error': {'message': "A sala não existe."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
-        if not card and room.initiation_game == False:
+        if not card and room.game_iniciado == False:
             return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
-        if not card == False and room.initiation_game == True:
+        if not card == False and room.game_iniciado == True:
             return Response({'error': {'message': "O jogo já começou, aguarde a próxima rodada."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 

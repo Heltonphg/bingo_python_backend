@@ -9,7 +9,7 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ('id', 'bingo', 'users', 'type',
-                  'valor_premio','value_card', 'initiation_game',
+                  'valor_premio','value_card', 'game_iniciado',
                   'minumum_quantity',
                   'created_at',
                   'updated_at'
