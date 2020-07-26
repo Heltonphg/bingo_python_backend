@@ -71,5 +71,5 @@ class RoomViewSet(viewsets.ModelViewSet):
             serializer = RoomSerializer(instance=room).data
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
-            return Response({'error': {'message': "Ops, Você não tem permissão para entrar nessa sala!"}},
+            return Response({'error': {'message': "Você não tem permissão para entrar nessa sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)

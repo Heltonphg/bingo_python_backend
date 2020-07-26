@@ -10,6 +10,7 @@ class UserAuthViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserAuthSerializer
 
+
     @action(methods=['POST'], detail=False, authentication_classes=(), permission_classes=())
     def cadastrar(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
