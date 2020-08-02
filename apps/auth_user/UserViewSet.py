@@ -10,7 +10,6 @@ class UserAuthViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserAuthSerializer
 
-
     @action(methods=['POST'], detail=False, authentication_classes=(), permission_classes=())
     def cadastrar(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -18,3 +17,4 @@ class UserAuthViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+

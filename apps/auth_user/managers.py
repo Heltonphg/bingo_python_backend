@@ -4,9 +4,6 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
-        """
-        Cria e salva um usuário com o email e a senha fornecidos.
-        """
         if not email:
             raise ValueError('O email fornecido deve ser definido')
         email = self.normalize_email(email)

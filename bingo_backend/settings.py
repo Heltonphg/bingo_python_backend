@@ -49,6 +49,9 @@ ROOT_URLCONF = 'bingo_backend.urls'
 
 AUTH_USER_MODEL = 'auth_user.User'
 
+
+DATE_INPUT_FORMATS = ['%d-%m-%Y', '%Y-%m-%d', '%d/%m/%Y']
+
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=15),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'apps.auth_user.utils.my_jwt_response_handler'
@@ -63,6 +66,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    'DATE_INPUT_FORMATS': ['%d-%m-%Y', '%Y-%m-%d', '%d/%m/%Y'],
 }
 
 TEMPLATES = [
