@@ -12,7 +12,7 @@ class CardBingoViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if not instance.is_activate:
+        if not instance.is_activate or instance.price <= 0:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
@@ -24,7 +24,7 @@ class CardBingoViewSet(viewsets.ModelViewSet):
         data = {
             "user": request.user.pk,
             "room": pk,
-            "card": request.data['card'],
+            "cartelao": request.data['cartelao'],
             "price": request.data['price']
         }
         serializer = self.get_serializer(data=data)

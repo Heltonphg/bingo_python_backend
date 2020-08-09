@@ -13,10 +13,10 @@ class CardBingoSerializer(serializers.ModelSerializer):
                                   allow_empty=True, allow_null=True)
     user = PrimaryKeyNestedMixin(queryset=User.objects.all(), serializer=UserSimpleSerializer, required=False,
                                   allow_empty=True, allow_null=True)
-    card = serializers.JSONField()
+    cartelao = serializers.JSONField()
 
     class Meta:
         model = CardBingo
         fields = (
-           'id', 'user', 'room', 'card', 'is_activate', 'price'
+           'id', 'user', 'room', 'cartelao', 'is_activate', 'price'
         )

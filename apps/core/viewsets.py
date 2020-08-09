@@ -49,6 +49,10 @@ class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
+    def remover_user(self, room, user):
+        room.users.remove(user)
+        RoomSerializer(instance=room).data
+
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
@@ -59,17 +63,20 @@ class RoomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not card and room.game_iniciado == False:
+            self.remover_user(room=room, user=request.user)
             return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not card == False and room.game_iniciado == True:
+            self.remover_user(room=room, user=request.user)
             return Response({'error': {'message': "O jogo já começou, aguarde a próxima rodada."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if room.is_pode_entrar(card=card):
             room.users.add(request.user)
-            serializer = RoomSerializer(instance=room).data
+            RoomSerializer(instance=room).data
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
+            self.remover_user(room=room, user=request.user)
             return Response({'error': {'message': "Você não tem permissão para entrar nessa sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
