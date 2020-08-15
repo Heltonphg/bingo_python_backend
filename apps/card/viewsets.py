@@ -5,22 +5,23 @@ from rest_framework.response import Response
 from apps.card.models import CardBingo
 from apps.card.serializers import CardBingoSerializer
 
-
 class CardBingoViewSet(viewsets.ModelViewSet):
     queryset = CardBingo.objects.all()
     serializer_class = CardBingoSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if not instance.is_activate or instance.price <= 0:
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     if not instance.is_activate or instance.price <= 0:
+    #         self.perform_destroy(instance)
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
+    #     else:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     @action(methods=['post'], detail=True)
     def cadastrar(self, request, pk):
+        card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
+        if card:
+            raise serializers.ValidationError('Você já possui uma cartela ativa.')
         data = {
             "user": request.user.pk,
             "room": pk,
@@ -41,3 +42,4 @@ class CardBingoViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError('Você não possui nenhuma cartela ativa.')
         serializer = CardBingoSerializer(instance=card).data
         return Response(serializer, status=status.HTTP_200_OK)
+
