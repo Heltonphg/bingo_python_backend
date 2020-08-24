@@ -6,6 +6,7 @@ class Bingo(models.Model):
     name = models.CharField(max_length=150)
     is_activated = models.BooleanField(default=True)
     time_initiation = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if Bingo.objects.filter(is_activated=True).first():
@@ -19,7 +20,7 @@ class Bingo(models.Model):
 
 
     def __str__(self):
-        return '{} - {}'.format(self.name, self.time_initiation.strftime('%b/%d/%Y (%A) as %H:%M:%S '))
+        return '{} - {}'.format(self.name, self.created_at.strftime('%b/%d/%Y (%A) as %H:%M:%S '))
 
 
 class Room(models.Model):

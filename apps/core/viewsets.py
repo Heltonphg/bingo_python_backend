@@ -63,12 +63,11 @@ class RoomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not card and room.game_iniciado == False:
-            self.remover_user(room=room, user=request.user)
+
             return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
         if not card == False and room.game_iniciado == True:
-            self.remover_user(room=room, user=request.user)
             return Response({'error': {'message': "O jogo já começou, aguarde a próxima rodada."}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -77,6 +76,6 @@ class RoomViewSet(viewsets.ModelViewSet):
             RoomSerializer(instance=room).data
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
-            self.remover_user(room=room, user=request.user)
+            # self.remover_user(room=room, user=request.user)
             return Response({'error': {'message': "Você não tem permissão para entrar nessa sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
