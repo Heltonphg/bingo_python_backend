@@ -9,7 +9,6 @@ class UserSimpleSerializer(serializers.ModelSerializer):
 
 class UserAuthSerializer(serializers.ModelSerializer):
     cards = serializers.SerializerMethodField()
-
     class Meta:
         model = User
         fields = ['id', 'email', 'full_name', 'password',

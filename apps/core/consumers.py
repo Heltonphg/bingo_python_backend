@@ -9,7 +9,7 @@ import math
 import time, sys
 
 from django.utils import timezone
-from datetime import datetime
+from datetime import timedelta
 
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
@@ -20,25 +20,33 @@ class GameConsumer(WebsocketConsumer):
     user_online = None
     cartelao = None
     time = None
+    bingo = None
+
+    def calc_time(self,):
+        limit_time = 600
+        minutes = timezone.now() - self.time
+        total_seconds = limit_time - minutes.total_seconds()
+        segundo = math.floor(total_seconds % 60)
+        total_minutes = total_seconds / 60
+        m = math.floor(total_minutes % 60)
+
+        seconds = '0' + str(segundo) if segundo < 10 else segundo
+        minutes = '0' + str(m) if m < 10 else m
+
+        time = '{}:{}'.format(minutes, seconds)
+        return time
+
 
     def regressive_time(self, event):
-        if not self.time:
-            bingo = Bingo.objects.filter(is_activated=True).first()
-            self.time = bingo.created_at
-            print(timezone.now() - self.time)
-        cont = 600
+        if not self.bingo:
+            self.bingo = Bingo.objects.filter(is_activated=True).first()
+            self.time = self.bingo.created_at
         while True:
-            cont -= 1
-            segundos = cont
-            segundo = math.floor(segundos % 60)
-            minutos = segundos / 60
-            minuto = math.floor(minutos % 60)
-
-            seconds = '0' + str(segundo) if segundo < 10 else segundo
-            minutes = '0' + str(minuto) if minuto < 10 else minuto
-
-            comeco = '{}:{}'.format(minutes, seconds)
-
+            comeco = self.calc_time()
+            if comeco == '00:00':
+                self.bingo.created_at = timezone.now()
+                self.bingo.save()
+                self.time = self.bingo.created_at
             self.send(json.dumps({'key': 'manager.regressive', 'value': comeco}))
             sys.stdout.flush()
             time.sleep(1)
@@ -54,7 +62,8 @@ class GameConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        pass
+        async_to_sync(self.channel_layer.group_discard)("game", self.channel_name)
+        self.accept()
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)

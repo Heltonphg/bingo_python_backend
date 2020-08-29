@@ -7,7 +7,6 @@ from bingo_backend import settings
 from .managers import UserManager
 
 
-
 class User(AbstractBaseUser, PermissionsMixin):
     MASCULINO = 'MASCULINO'
     FEMININO = 'FEMININO'
@@ -41,4 +40,3 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-

@@ -1,5 +1,6 @@
 from django.db import models, transaction
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 
 class Bingo(models.Model):
@@ -10,14 +11,13 @@ class Bingo(models.Model):
 
     def save(self, *args, **kwargs):
         if Bingo.objects.filter(is_activated=True).first():
-            raise serializers.ValidationError('Já existe um bingo ativo')
+            if not self.pk:
+                raise serializers.ValidationError('Já existe um bingo ativo')
         else:
             with transaction.atomic():
                 super(Bingo, self).save(*args, **kwargs)
                 Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='Vip', value_card=2)
                 Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='Grátis', value_card=0)
-
-
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.created_at.strftime('%b/%d/%Y (%A) as %H:%M:%S '))
@@ -48,7 +48,6 @@ class Room(models.Model):
                 if card.is_activate:
                     valor += card.price
         return valor
-
 
     def __str__(self):
         return self.type
