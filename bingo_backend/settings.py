@@ -2,6 +2,8 @@ import os
 
 import datetime
 
+from django.conf.global_settings import EMAIL_BACKEND
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -50,7 +52,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'bingo_backend.urls'
 
 AUTH_USER_MODEL = 'auth_user.User'
-
 
 DATE_INPUT_FORMATS = ['%d-%m-%Y', '%Y-%m-%d', '%d/%m/%Y']
 
@@ -138,6 +139,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Bingo <comparachina@gmail.com>'
+EMAIL_HOST = 'email-smtp.sa-east-1.amazonaws.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'AKIAYVWJHSRA6366HV4B'
+EMAIL_HOST_PASSWORD = 'BNbVvHdRtpX9D5hd3atYv5IVew61Ql7GbWO5aioEQqkd'
+EMAIL_USE_TLS = True
 
 CHANNEL_LAYERS = {
     "default": {

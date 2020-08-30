@@ -22,6 +22,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     sex = models.CharField(max_length=10, choices=SEX)
     avatar = models.ImageField(upload_to='images', verbose_name='Imagem', null=True, blank=True)
     birth_date = models.DateField(blank=True, null=True)
+    token = models.CharField(max_length=22, null=True, blank=True, default=None)
+    token_created_at = models.DateField(blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

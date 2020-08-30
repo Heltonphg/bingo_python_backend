@@ -1,6 +1,5 @@
 from django.db import models, transaction
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 
 
 class Bingo(models.Model):

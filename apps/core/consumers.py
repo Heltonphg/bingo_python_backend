@@ -9,7 +9,6 @@ import math
 import time, sys
 
 from django.utils import timezone
-from datetime import timedelta
 
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
@@ -22,7 +21,7 @@ class GameConsumer(WebsocketConsumer):
     time = None
     bingo = None
 
-    def calc_time(self,):
+    def calc_time(self, ):
         limit_time = 600
         minutes = timezone.now() - self.time
         total_seconds = limit_time - minutes.total_seconds()
@@ -35,7 +34,6 @@ class GameConsumer(WebsocketConsumer):
 
         time = '{}:{}'.format(minutes, seconds)
         return time
-
 
     def regressive_time(self, event):
         if not self.bingo:
