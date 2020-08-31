@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'channels',
     'apps.core',
     'apps.card',
+    'apps.notifications',
     'apps.auth_user',
 
 ]

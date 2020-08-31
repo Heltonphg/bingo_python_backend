@@ -7,13 +7,14 @@ from rest_framework_jwt.views import obtain_jwt_token
 from apps.auth_user.UserViewSet import UserAuthViewSet
 from apps.card.viewsets import CardBingoViewSet
 from apps.core.viewsets import BingoViewSet, RoomViewSet
-
+from apps.notifications.viewsets import NotificationViewset
 
 router = routers.DefaultRouter()
 router.register(r'bingos', BingoViewSet)
 router.register(r'rooms', RoomViewSet)
 router.register(r'cards', CardBingoViewSet)
 router.register(r'users', UserAuthViewSet)
+router.register(r'notifications', NotificationViewset)
 
 urlpatterns = [
     path('', include(router.urls)),
