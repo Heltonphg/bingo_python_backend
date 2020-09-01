@@ -22,7 +22,7 @@ class GameConsumer(WebsocketConsumer):
     bingo = None
 
     def calc_time(self, ):
-        limit_time = 600
+        limit_time = 200
         minutes = timezone.now() - self.time
         total_seconds = limit_time - minutes.total_seconds()
         segundo = math.floor(total_seconds % 60)

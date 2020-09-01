@@ -4,6 +4,8 @@ from rest_framework import routers
 from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework_jwt.views import obtain_jwt_token
+
+from apps.account.viewsets import AccountViewSet
 from apps.auth_user.UserViewSet import UserAuthViewSet
 from apps.card.viewsets import CardBingoViewSet
 from apps.core.viewsets import BingoViewSet, RoomViewSet
@@ -15,6 +17,7 @@ router.register(r'rooms', RoomViewSet)
 router.register(r'cards', CardBingoViewSet)
 router.register(r'users', UserAuthViewSet)
 router.register(r'notifications', NotificationViewset)
+router.register(r'account', AccountViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
