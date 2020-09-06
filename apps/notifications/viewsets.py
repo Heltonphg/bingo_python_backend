@@ -26,10 +26,7 @@ class NotificationViewset(viewsets.ModelViewSet):
                     'include_player_ids': ['2cb74857-2e8a-4c0b-aa79-656e3b6e7f2d'],
                 }
                 response = client.send_notification(notification_body)
-                print(response.body)  # JSON parsed response
-                print(response.status_code)  # Status code of response
-                print(response.http_response)  # Original http response object.
-            except OneSignalHTTPError as e:  # An exception is raised if response.status_code != 2xx
+            except OneSignalHTTPError as e:
                 print(e)
                 print(e.status_code)
 

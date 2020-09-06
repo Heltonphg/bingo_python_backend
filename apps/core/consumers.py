@@ -13,6 +13,7 @@ from django.utils import timezone
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
 from apps.core.models import Bingo
+from apps.notifications.models import Notifications
 
 
 class GameConsumer(WebsocketConsumer):
@@ -22,9 +23,15 @@ class GameConsumer(WebsocketConsumer):
     bingo = None
 
     def calc_time(self, ):
-        limit_time = 200
+        limit_time = 100
         minutes = timezone.now() - self.time
         total_seconds = limit_time - minutes.total_seconds()
+        if total_seconds <= 0:
+            bingo = Bingo.objects.filter(is_activated=True).first()
+            bingo.created_at = timezone.now()
+            bingo.save()
+            self.time = bingo.created_at
+
         segundo = math.floor(total_seconds % 60)
         total_minutes = total_seconds / 60
         m = math.floor(total_minutes % 60)
@@ -41,10 +48,15 @@ class GameConsumer(WebsocketConsumer):
             self.time = self.bingo.created_at
         while True:
             comeco = self.calc_time()
-            if comeco == '00:00':
-                self.bingo.created_at = timezone.now()
-                self.bingo.save()
-                self.time = self.bingo.created_at
+
+            if comeco == '09:00':
+                notifica = Notifications.objects.filter(user=self.user_online, lida=False).first()
+                if not notifica:
+                    Notifications.objects.create(user=self.user_online,
+                                                 message="O jogo vai começar em {} minutos".format(comeco),
+                                                 title="Depressa, faltam {} minutos!!!".format(comeco))
+                    self.send(json.dumps({'key': 'manager.notificas', 'value': ''}))
+
             self.send(json.dumps({'key': 'manager.regressive', 'value': comeco}))
             sys.stdout.flush()
             time.sleep(1)

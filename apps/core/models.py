@@ -9,9 +9,12 @@ class Bingo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
+
         if Bingo.objects.filter(is_activated=True).first():
             if not self.pk:
                 raise serializers.ValidationError('Já existe um bingo ativo')
+            else:
+                super(Bingo, self).save(*args, **kwargs)
         else:
             with transaction.atomic():
                 super(Bingo, self).save(*args, **kwargs)
