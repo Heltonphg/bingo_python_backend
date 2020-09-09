@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
-from apps.core.models import Bingo
+from apps.core.models import Bingo, Room
 from apps.notifications.models import Notifications
 
 
@@ -21,6 +21,7 @@ class GameConsumer(WebsocketConsumer):
     cartelao = None
     time = None
     bingo = None
+    room = None
 
     def calc_time(self, ):
         limit_time = 100
@@ -38,14 +39,15 @@ class GameConsumer(WebsocketConsumer):
 
         seconds = '0' + str(segundo) if segundo < 10 else segundo
         minutes = '0' + str(m) if m < 10 else m
+        time = ''
+        if total_seconds <= 0:
+            time = '00:00'
+        else:
+            time = '{}:{}'.format(minutes, seconds)
 
-        time = '{}:{}'.format(minutes, seconds)
         return time
 
     def regressive_time(self, event):
-        if not self.bingo:
-            self.bingo = Bingo.objects.filter(is_activated=True).first()
-            self.time = self.bingo.created_at
         while True:
             comeco = self.calc_time()
 
@@ -63,7 +65,16 @@ class GameConsumer(WebsocketConsumer):
 
     def connect(self):
         id = self.scope['url_route']['kwargs']['user_id']
+        if not self.bingo:
+            self.bingo = Bingo.objects.filter(is_activated=True).first()
+            self.time = self.bingo.created_at
+
         self.user_online = User.objects.filter(pk=id).first()
+
+        if not self.room:
+            user = User.objects.filter(pk=id).first()
+            self.room = Room.objects.filter(id=user.cards.all()[0].room_id).first()
+
         if CardBingo.objects.filter(is_activate=True, user=self.user_online).exists():
             self.catelao = CardBingo.objects.filter(is_activate=True, user=self.user_online).first()
         if not self.user_online:
@@ -72,8 +83,7 @@ class GameConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)("game", self.channel_name)
-        self.accept()
+        self.close()
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)

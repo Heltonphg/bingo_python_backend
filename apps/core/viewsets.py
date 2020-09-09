@@ -60,16 +60,16 @@ class RoomViewSet(viewsets.ModelViewSet):
 
         if not room:
             return Response({'error': {'message': "A sala não existe."}},
-                            status=status.HTTP_401_UNAUTHORIZED)
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if not card and room.game_iniciado == False:
 
             return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
-                            status=status.HTTP_401_UNAUTHORIZED)
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        if not card == False and room.game_iniciado == True:
-            return Response({'error': {'message': "O jogo já começou, aguarde a próxima rodada."}},
-                            status=status.HTTP_401_UNAUTHORIZED)
+        if not card == False and room.game_iniciado == True and request.user not in room.users.all():
+            return Response({'error': {'message': "Infelizmente, você não chegou a tempo. Aguarde a próxima rodada!"}},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if room.is_pode_entrar(card=card):
             room.users.add(request.user)
