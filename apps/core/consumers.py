@@ -21,17 +21,16 @@ class GameConsumer(WebsocketConsumer):
     cartelao = None
     time = None
     bingo = None
-    room = None
+    room_vip = None
+    room_gratis = None
 
-    def calc_time(self, ):
-        limit_time = 100
-        minutes = timezone.now() - self.time
+    def calc_time(self, room):
+        limit_time = 90
+        minutes = timezone.now() - room.created_at
         total_seconds = limit_time - minutes.total_seconds()
         if total_seconds <= 0:
-            bingo = Bingo.objects.filter(is_activated=True).first()
-            bingo.created_at = timezone.now()
-            bingo.save()
-            self.time = bingo.created_at
+            room.created_at = timezone.now()
+            room.save()
 
         segundo = math.floor(total_seconds % 60)
         total_minutes = total_seconds / 60
@@ -49,17 +48,19 @@ class GameConsumer(WebsocketConsumer):
 
     def regressive_time(self, event):
         while True:
-            comeco = self.calc_time()
+            comeco_vip = self.calc_time(self.room_vip)
+            comeco_gratis = self.calc_time(self.room_gratis)
 
-            if comeco == '09:00':
-                notifica = Notifications.objects.filter(user=self.user_online, lida=False).first()
-                if not notifica:
-                    Notifications.objects.create(user=self.user_online,
-                                                 message="O jogo vai começar em {} minutos".format(comeco),
-                                                 title="Depressa, faltam {} minutos!!!".format(comeco))
-                    self.send(json.dumps({'key': 'manager.notificas', 'value': ''}))
+            # if comeco_vip or comeco_vip == '09:00':
+            #     notifica = Notifications.objects.filter(user=self.user_online, lida=False).first()
+            #     if not notifica:
+            #         Notifications.objects.create(user=self.user_online,
+            #                                      message="O jogo vai começar em {} minutos".format(comeco),
+            #                                      title="Depressa, faltam {} minutos!!!".format(comeco))
+            #         self.send(json.dumps({'key': 'manager.notificas', 'value': ''}))
 
-            self.send(json.dumps({'key': 'manager.regressive', 'value': comeco}))
+            self.send(json.dumps({'key': 'manager.regressive_vip', 'value': comeco_vip}))
+            self.send(json.dumps({'key': 'manager.regressive_gratis', 'value': comeco_gratis}))
             sys.stdout.flush()
             time.sleep(1)
 
@@ -67,13 +68,10 @@ class GameConsumer(WebsocketConsumer):
         id = self.scope['url_route']['kwargs']['user_id']
         if not self.bingo:
             self.bingo = Bingo.objects.filter(is_activated=True).first()
-            self.time = self.bingo.created_at
+            self.room_vip = self.bingo.rooms.all().get(type='Vip')
+            self.room_gratis = self.bingo.rooms.all().get(type='Grátis')
 
         self.user_online = User.objects.filter(pk=id).first()
-
-        if not self.room:
-            user = User.objects.filter(pk=id).first()
-            self.room = Room.objects.filter(id=user.cards.all()[0].room_id).first()
 
         if CardBingo.objects.filter(is_activate=True, user=self.user_online).exists():
             self.catelao = CardBingo.objects.filter(is_activate=True, user=self.user_online).first()
