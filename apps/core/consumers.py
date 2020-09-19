@@ -25,6 +25,7 @@ class GameConsumer(WebsocketConsumer):
     room_gratis = None
 
     def calc_time(self, room):
+        #todo: vai ser sete minutos
         limit_time = 90
         minutes = timezone.now() - room.created_at
         total_seconds = limit_time - minutes.total_seconds()

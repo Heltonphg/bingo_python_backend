@@ -24,17 +24,17 @@ class BingoViewSet(viewsets.ModelViewSet):
     def cadastrar_bingo(self, request):
         hoje = datetime.now()
         hora = hoje.hour
-        name_bingo = 'Bindo '
-        if hora >= 0 and hora < 6:
-            name_bingo += 'da Madrugada'
-        elif hora >= 6 and hora < 12:
-            name_bingo += 'da Manhã'
-        elif hora >= 12 and hora < 13:
-            name_bingo += 'do Meio-Dia'
-        elif hora >= 13 and hora < 18:
-            name_bingo += 'da Tarde'
-        elif hora >= 18 and hora < 24:
-            name_bingo += 'da Noite'
+        name_bingo = 'Sala '
+        # if hora >= 0 and hora < 6:
+        #     name_bingo += 'da Madrugada'
+        # elif hora >= 6 and hora < 12:
+        #     name_bingo += 'da Manhã'
+        # elif hora >= 12 and hora < 13:
+        #     name_bingo += 'do Meio-Dia'
+        # elif hora >= 13 and hora < 18:
+        #     name_bingo += 'da Tarde'
+        # elif hora >= 18 and hora < 24:
+        #     name_bingo += 'da Noite'
 
         serializer = BingoSerializer(data={
             'name': name_bingo,
