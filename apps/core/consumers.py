@@ -24,28 +24,40 @@ class GameConsumer(WebsocketConsumer):
     room_vip = None
     room_gratis = None
 
-    def calc_time(self, room):
-        #todo: vai ser sete minutos
-        limit_time = 90
-        minutes = timezone.now() - room.created_at
-        total_seconds = limit_time - minutes.total_seconds()
-        if total_seconds <= 0:
-            room.created_at = timezone.now()
-            room.save()
-
-        segundo = math.floor(total_seconds % 60)
-        total_minutes = total_seconds / 60
-        m = math.floor(total_minutes % 60)
-
-        seconds = '0' + str(segundo) if segundo < 10 else segundo
-        minutes = '0' + str(m) if m < 10 else m
-        time = ''
-        if total_seconds <= 0:
-            time = '00:00'
+    def cancelOrReset(self, room):
+        room.created_at = timezone.now()
+        if len(room.users.all()) >= room.minumum_quantity:
+            print('caiu aqui')
+            room.game_iniciado = True
         else:
-            time = '{}:{}'.format(minutes, seconds)
+            print('nada a ver')
+        room.save()
 
-        return time
+    def calc_time(self, room):
+        if room.game_iniciado == False:
+            #todo: vai ser sete minutos
+            limit_time = 50
+            minutes = timezone.now() - room.created_at
+            total_seconds = limit_time - minutes.total_seconds()
+            if total_seconds <= 0:
+                self.cancelOrReset(room)
+
+
+            segundo = math.floor(total_seconds % 60)
+            total_minutes = total_seconds / 60
+            m = math.floor(total_minutes % 60)
+
+            seconds = '0' + str(segundo) if segundo < 10 else segundo
+            minutes = '0' + str(m) if m < 10 else m
+            time = ''
+            if total_seconds <= 0:
+                time = '00:00'
+            else:
+                time = '{}:{}'.format(minutes, seconds)
+
+            return time
+        else:
+            return 'Iniciado'
 
     def regressive_time(self, event):
         while True:
@@ -78,7 +90,7 @@ class GameConsumer(WebsocketConsumer):
             self.catelao = CardBingo.objects.filter(is_activate=True, user=self.user_online).first()
         if not self.user_online:
             self.close()
-        async_to_sync(self.channel_layer.group_add)("game", self.channel_name)
+        async_to_sync(self.channel_layer.group_add)("globals", self.channel_name)
         self.accept()
 
     def disconnect(self, close_code):
@@ -90,7 +102,7 @@ class GameConsumer(WebsocketConsumer):
             print('o usuário {} se conectou'.format(request_dict['value']['nome']))
             self.send(json.dumps({'key': 'manager.teste', 'value': ''}))
             async_to_sync(self.channel_layer.group_send)(
-                'game',
+                'globals',
                 {'type': "regressive.time"}
             )
 
@@ -106,7 +118,7 @@ def pos_save(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
-            'game',
+            'globals',
             {
                 'type': "regressive.time",
             }

@@ -18,8 +18,8 @@ class Bingo(models.Model):
         else:
             with transaction.atomic():
                 super(Bingo, self).save(*args, **kwargs)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='Vip', value_card=7)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='Grátis', value_card=0)
+                Room.objects.create(bingo_id=self.id, minumum_quantity=2, type='Vip', value_card=7)
+                Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Grátis', value_card=0)
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.created_at.strftime('%b/%d/%Y (%A) as %H:%M:%S '))

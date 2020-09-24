@@ -19,7 +19,6 @@ class BingoViewSet(viewsets.ModelViewSet):
         serializer = BingoSerializer(instance=bingo).data
         return Response(serializer, status=status.HTTP_200_OK)
 
-
     @action(methods=['post'], detail=False)
     def cadastrar_bingo(self, request):
         hoje = datetime.now()
@@ -57,17 +56,17 @@ class RoomViewSet(viewsets.ModelViewSet):
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
         room = Room.objects.filter(id=pk).first()
+        print('aqui', card)
 
         if not room:
             return Response({'error': {'message': "A sala não existe."}},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if not card and room.game_iniciado == False:
-
             return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        if not card == False and room.game_iniciado == True and request.user not in room.users.all():
+        if not card and room.game_iniciado == True and request.user not in room.users.all():
             return Response({'error': {'message': "Infelizmente, você não chegou a tempo. Aguarde a próxima rodada!"}},
                             status=status.HTTP_400_BAD_REQUEST)
 

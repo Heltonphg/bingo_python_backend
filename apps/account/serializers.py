@@ -9,6 +9,7 @@ from apps.auth_user.serializers import UserSimpleSerializer
 class AccoutSerializer(serializers.ModelSerializer):
     user = PrimaryKeyNestedMixin(queryset=User.objects.all(), serializer=UserSimpleSerializer, required=False,
                                  allow_empty=True, allow_null=True)
+
     class Meta:
         model = Account
-        fields = ('id', 'user', 'operacao', 'conta', 'validade', 'agencia','nome','banco')
+        fields = ('id', 'user', 'conta', 'validade', 'agencia', 'nome', 'banco', 'cpf', 'tipo')

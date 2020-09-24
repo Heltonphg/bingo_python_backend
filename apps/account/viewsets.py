@@ -21,8 +21,10 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False)
     def criar(self, request):
-        account = Account.objects.create(user_id=request.user.id, nome=request.data['nome'],
-                                         operacao=request.data['operacao'],
+        account = Account.objects.create(user_id=request.user.id,
+                                         nome=request.data['nome'],
+                                         cpf=request.data['cpf'],
+                                         tipo=request.data['tipo'],
                                          banco=request.data['banco'],
                                          conta=request.data['conta'], validade=request.data['validade'],
                                          agencia=request.data['agencia'])
