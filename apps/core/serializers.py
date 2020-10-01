@@ -11,6 +11,8 @@ class RoomSerializer(serializers.ModelSerializer):
         fields = ('id', 'bingo', 'users', 'type',
                   'valor_premio','value_card', 'game_iniciado',
                   'minumum_quantity',
+                  'attempts',
+                  'closed',
                   'created_at',
                   'updated_at'
                   )
@@ -24,7 +26,7 @@ class BingoSerializer(serializers.ModelSerializer):
     rooms = RoomSerializer(many=True, read_only=False, required=False)
     class Meta:
         model = Bingo
-        fields = ('id', 'name', 'rooms', 'time_initiation', 'created_at','is_activated')
+        fields = ('id', 'name', 'rooms', 'created_at', 'is_activated')
 
 
 

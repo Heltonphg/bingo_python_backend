@@ -5,7 +5,6 @@ from rest_framework import serializers
 class Bingo(models.Model):
     name = models.CharField(max_length=150)
     is_activated = models.BooleanField(default=True)
-    time_initiation = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -34,7 +33,9 @@ class Room(models.Model):
     users = models.ManyToManyField(to='auth_user.User', related_name="rooms", blank=True, default=list)
     type = models.CharField(max_length=10, choices=TYPES)
     minumum_quantity = models.IntegerField()
+    attempts = models.IntegerField(default=3)
     game_iniciado = models.BooleanField(default=False)
+    closed = models.BooleanField(default=False)
     value_card = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

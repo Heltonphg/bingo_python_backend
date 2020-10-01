@@ -29,12 +29,13 @@ class GameConsumer(WebsocketConsumer):
         if len(room.users.all()) >= room.minumum_quantity:
             print('caiu aqui')
             room.game_iniciado = True
+            room.closed = True
         else:
-            print('nada a ver')
+            print('Não atendeu')
         room.save()
 
     def calc_time(self, room):
-        if room.game_iniciado == False:
+        if room.closed == False:
             #todo: vai ser sete minutos
             limit_time = 50
             minutes = timezone.now() - room.created_at
@@ -60,6 +61,7 @@ class GameConsumer(WebsocketConsumer):
             return 'Iniciado'
 
     def regressive_time(self, event):
+        self.getInfosBingo()
         while True:
             comeco_vip = self.calc_time(self.room_vip)
             comeco_gratis = self.calc_time(self.room_gratis)
@@ -77,12 +79,16 @@ class GameConsumer(WebsocketConsumer):
             sys.stdout.flush()
             time.sleep(1)
 
+    def getInfosBingo(self):
+        if not self.bingo:
+            if Bingo.objects.filter(is_activated=True).exists():
+                self.bingo = Bingo.objects.filter(is_activated=True).first()
+                self.room_vip = self.bingo.rooms.all().get(type='Vip')
+                self.room_gratis = self.bingo.rooms.all().get(type='Grátis')
+
     def connect(self):
         id = self.scope['url_route']['kwargs']['user_id']
-        if not self.bingo:
-            self.bingo = Bingo.objects.filter(is_activated=True).first()
-            self.room_vip = self.bingo.rooms.all().get(type='Vip')
-            self.room_gratis = self.bingo.rooms.all().get(type='Grátis')
+        self.getInfosBingo()
 
         self.user_online = User.objects.filter(pk=id).first()
 
