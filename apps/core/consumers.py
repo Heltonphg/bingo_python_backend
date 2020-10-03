@@ -29,13 +29,12 @@ class GameConsumer(WebsocketConsumer):
         if len(room.users.all()) >= room.minumum_quantity:
             print('caiu aqui')
             room.game_iniciado = True
-            room.closed = True
         else:
             print('Não atendeu')
         room.save()
 
     def calc_time(self, room):
-        if room.closed == False:
+        if room.game_iniciado == False:
             #todo: vai ser sete minutos
             limit_time = 50
             minutes = timezone.now() - room.created_at

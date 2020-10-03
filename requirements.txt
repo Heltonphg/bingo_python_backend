@@ -9,4 +9,5 @@ django-cors-headers==3.4.0
 django-jsonfield==1.4.0
 djangorestframework-jwt==1.11.0
 channels-redis==3.0.1
-
+djangorestframework==3.12.1
+onesignal-sdk==2.00

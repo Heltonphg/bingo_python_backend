@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'cpffield',
     'rest_framework',
-    'background_task',
     'rest_framework.authtoken',
     'channels',
     'apps.core',

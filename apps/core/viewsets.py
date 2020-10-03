@@ -41,7 +41,7 @@ class RoomViewSet(viewsets.ModelViewSet):
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
         room = Room.objects.filter(id=pk).first()
-        print('aqui', card)
+        print('Tem cartela:?', card)
 
         if not room:
             return Response({'error': {'message': "A sala não existe."}},
