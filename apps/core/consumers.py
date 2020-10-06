@@ -27,16 +27,13 @@ class GameConsumer(WebsocketConsumer):
     def cancelOrReset(self, room):
         room.created_at = timezone.now()
         if len(room.users.all()) >= room.minumum_quantity:
-            print('caiu aqui')
             room.game_iniciado = True
-        else:
-            print('Não atendeu')
         room.save()
 
     def calc_time(self, room):
         if room.game_iniciado == False:
             #todo: vai ser sete minutos
-            limit_time = 50
+            limit_time = 500
             minutes = timezone.now() - room.created_at
             total_seconds = limit_time - minutes.total_seconds()
             if total_seconds <= 0:
@@ -92,7 +89,7 @@ class GameConsumer(WebsocketConsumer):
         self.user_online = User.objects.filter(pk=id).first()
 
         if CardBingo.objects.filter(is_activate=True, user=self.user_online).exists():
-            self.catelao = CardBingo.objects.filter(is_activate=True, user=self.user_online).first()
+            self.cartelao = CardBingo.objects.filter(is_activate=True, user=self.user_online).first()
         if not self.user_online:
             self.close()
         async_to_sync(self.channel_layer.group_add)("globals", self.channel_name)
@@ -112,7 +109,7 @@ class GameConsumer(WebsocketConsumer):
             )
 
             if self.cartelao:
-                self.send(json.dumps({'key': 'manager.cartela', 'value': self.cartelao.cartelao}))
+                self.send(json.dumps({'key': 'manager.cartelao', 'value': self.cartelao.cartelao}))
 
         if request_dict['key'] == 'log':
             print(request_dict['value']['message'])

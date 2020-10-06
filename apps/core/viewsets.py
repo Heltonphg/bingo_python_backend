@@ -48,7 +48,7 @@ class RoomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         if not card and room.game_iniciado == False:
-            return Response({'error': {'message': "Escolha uma cartela para entrar na sala."}},
+            return Response({'error': {'message': "Escolha um cartelão para entrar na sala."}},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if not card and room.game_iniciado == True and request.user not in room.users.all():
