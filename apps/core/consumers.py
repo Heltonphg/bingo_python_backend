@@ -16,7 +16,7 @@ from apps.core.models import Bingo, Room
 from apps.notifications.models import Notifications
 
 
-class GameConsumer(WebsocketConsumer):
+class GlobalsConsumer(WebsocketConsumer):
     user_online = None
     cartelao = None
     time = None
