@@ -11,14 +11,11 @@ import time, sys
 from django.utils import timezone
 
 from apps.auth_user.models import User
-from apps.card.models import CardBingo
-from apps.core.models import Bingo, Room
-from apps.notifications.models import Notifications
+from apps.core.models import Bingo
 
 
 class GlobalsConsumer(WebsocketConsumer):
     user_online = None
-    cartelao = None
     time = None
     bingo = None
     room_vip = None
@@ -88,8 +85,6 @@ class GlobalsConsumer(WebsocketConsumer):
 
         self.user_online = User.objects.filter(pk=id).first()
 
-        if CardBingo.objects.filter(is_activate=True, user=self.user_online).exists():
-            self.cartelao = CardBingo.objects.filter(is_activate=True, user=self.user_online).first()
         if not self.user_online:
             self.close()
         async_to_sync(self.channel_layer.group_add)("globals", self.channel_name)
@@ -102,14 +97,11 @@ class GlobalsConsumer(WebsocketConsumer):
         request_dict = json.loads(text_data)
         if request_dict['key'] == 'client.auth':
             print('o usuário {} se conectou'.format(request_dict['value']['nome']))
-            self.send(json.dumps({'key': 'manager.teste', 'value': ''}))
+            self.send(json.dumps({'key': 'manager.verificarDispatch', 'value': ''}))
             async_to_sync(self.channel_layer.group_send)(
                 'globals',
                 {'type': "regressive.time"}
             )
-
-            if self.cartelao:
-                self.send(json.dumps({'key': 'manager.cartelao', 'value': self.cartelao.cartelao}))
 
         if request_dict['key'] == 'log':
             print(request_dict['value']['message'])
