@@ -3,7 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.card.models import CardBingo
-from apps.card.serializers import CardBingoSerializer
+from apps.card.serializers import CardBingoSerializer, MyCartelaoSerializer
+
 
 class CardBingoViewSet(viewsets.ModelViewSet):
     queryset = CardBingo.objects.all()
@@ -41,5 +42,14 @@ class CardBingoViewSet(viewsets.ModelViewSet):
         if not card:
             raise serializers.ValidationError('Você não possui nenhuma cartela ativa.')
         serializer = CardBingoSerializer(instance=card).data
+        return Response(serializer, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def get_my_cartelao(self, request):
+        card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
+        print(card)
+        if not card:
+            raise serializers.ValidationError('Você não possui nenhuma cartela.')
+        serializer = MyCartelaoSerializer(instance=card).data
         return Response(serializer, status=status.HTTP_200_OK)
 

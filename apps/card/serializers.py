@@ -20,3 +20,11 @@ class CardBingoSerializer(serializers.ModelSerializer):
         fields = (
            'id', 'user', 'room', 'cartelao', 'is_activate', 'price'
         )
+class MyCartelaoSerializer(serializers.ModelSerializer):
+    cartelao = serializers.JSONField()
+
+    class Meta:
+        model = CardBingo
+        fields = (
+            'id',  'cartelao',
+        )
