@@ -37,7 +37,7 @@ class CardBingoViewSet(viewsets.ModelViewSet):
 
 
     @action(methods=['get'], detail=False)
-    def minha_cartela(self, request):
+    def minha_cartela_ativa(self, request):
         card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
         if not card:
             raise serializers.ValidationError('Você não possui nenhuma cartela ativa.')
@@ -47,9 +47,8 @@ class CardBingoViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_my_cartelao(self, request):
         card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
-        print(card)
         if not card:
-            raise serializers.ValidationError('Você não possui nenhuma cartela.')
+            raise serializers.ValidationError('{},você ainda não possui nenhuma cartela.'.format(request.user))
         serializer = MyCartelaoSerializer(instance=card).data
         return Response(serializer, status=status.HTTP_200_OK)
 
