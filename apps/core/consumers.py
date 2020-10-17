@@ -6,12 +6,12 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
 import math
-import time, sys
 
 from django.utils import timezone
 
 from apps.auth_user.models import User
 from apps.core.models import Bingo
+from apps.core.tread import MyTread
 
 
 class GlobalsConsumer(WebsocketConsumer):
@@ -52,13 +52,10 @@ class GlobalsConsumer(WebsocketConsumer):
             return 'Iniciado'
 
     def regressive_time(self, event):
-        while True:
-            comeco_vip = self.calc_time(self.room_vip)
-            comeco_gratis = self.calc_time(self.room_gratis)
-            self.send(json.dumps({'key': 'manager.regressive_vip', 'value': comeco_vip}))
-            self.send(json.dumps({'key': 'manager.regressive_gratis', 'value': comeco_gratis}))
-            sys.stdout.flush()
-            time.sleep(1)
+        comeco_vip = self.calc_time(self.room_vip)
+        comeco_gratis = self.calc_time(self.room_gratis)
+        self.send(json.dumps({'key': 'manager.regressive_vip', 'value': comeco_vip}))
+        self.send(json.dumps({'key': 'manager.regressive_gratis', 'value': comeco_gratis}))
 
     def getInfosBingo(self):
         if not self.bingo:
@@ -92,11 +89,8 @@ class GlobalsConsumer(WebsocketConsumer):
             print('o usuário {} se conectou'.format(request_dict['value']['nome']))
             self.send(json.dumps({'key': 'manager.verificarDispatch', 'value': ''}))
             self.getInfosBingo()
-            async_to_sync(self.channel_layer.group_send)(
-                'globals',
-                {'type': "regressive.time"}
-            )
-
+            t = MyTread()
+            t.start()
 
         if request_dict['key'] == 'log':
             print(request_dict['value']['message'])
@@ -106,7 +100,7 @@ class GlobalsConsumer(WebsocketConsumer):
 def pos_save(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        print("entrou")
+        print("Receiver")
         async_to_sync(channel_layer.group_send)(
             'globals',
             {
