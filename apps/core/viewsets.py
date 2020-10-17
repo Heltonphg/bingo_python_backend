@@ -6,8 +6,6 @@ from apps.card.models import CardBingo
 from apps.core.models import Bingo, Room
 from apps.core.serializers import BingoSerializer, RoomSerializer
 
-from datetime import datetime
-
 
 class BingoViewSet(viewsets.ModelViewSet):
     queryset = Bingo.objects.all()

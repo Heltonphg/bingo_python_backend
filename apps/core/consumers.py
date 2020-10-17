@@ -29,13 +29,11 @@ class GlobalsConsumer(WebsocketConsumer):
 
     def calc_time(self, room):
         if not room.game_iniciado:
-            #todo: vai ser sete minutos
-            limit_time = 500
+            limit_time = 420
             minutes = timezone.now() - room.created_at
             total_seconds = limit_time - minutes.total_seconds()
             if total_seconds <= 0:
                 self.cancelOrReset(room)
-
 
             segundo = math.floor(total_seconds % 60)
             total_minutes = total_seconds / 60
@@ -54,19 +52,9 @@ class GlobalsConsumer(WebsocketConsumer):
             return 'Iniciado'
 
     def regressive_time(self, event):
-        self.getInfosBingo()
         while True:
             comeco_vip = self.calc_time(self.room_vip)
             comeco_gratis = self.calc_time(self.room_gratis)
-
-            # if comeco_vip or comeco_vip == '09:00':
-            #     notifica = Notifications.objects.filter(user=self.user_online, lida=False).first()
-            #     if not notifica:
-            #         Notifications.objects.create(user=self.user_online,
-            #                                      message="O jogo vai começar em {} minutos".format(comeco),
-            #                                      title="Depressa, faltam {} minutos!!!".format(comeco))
-            #         self.send(json.dumps({'key': 'manager.notificas', 'value': ''}))
-
             self.send(json.dumps({'key': 'manager.regressive_vip', 'value': comeco_vip}))
             self.send(json.dumps({'key': 'manager.regressive_gratis', 'value': comeco_gratis}))
             sys.stdout.flush()
@@ -91,17 +79,24 @@ class GlobalsConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
+        #self.channel_layer.group_discard(self.channel_name, 'globals')
         self.close()
+
+    def atualizar_room(self, event):
+        print("atualizar_room")
+        self.send(json.dumps({'key': 'manager.att_room'}))
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
         if request_dict['key'] == 'client.auth':
             print('o usuário {} se conectou'.format(request_dict['value']['nome']))
             self.send(json.dumps({'key': 'manager.verificarDispatch', 'value': ''}))
+            self.getInfosBingo()
             async_to_sync(self.channel_layer.group_send)(
                 'globals',
                 {'type': "regressive.time"}
             )
+
 
         if request_dict['key'] == 'log':
             print(request_dict['value']['message'])
@@ -111,9 +106,10 @@ class GlobalsConsumer(WebsocketConsumer):
 def pos_save(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
+        print("entrou")
         async_to_sync(channel_layer.group_send)(
             'globals',
             {
-                'type': "regressive.time",
+                'type': "atualizar.room",
             }
         )
