@@ -19,7 +19,8 @@ class GameConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        self.close()
+        self.channel_layer.group_discard(self.channel_name, 'game')
+        # self.close()
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)

@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from apps.auth_user.models import User
 from apps.core.models import Bingo
+from apps.core.serializers import RoomSerializer, BingoSerializer
 from apps.core.tread import MyTread
 
 
@@ -28,7 +29,7 @@ class GlobalsConsumer(WebsocketConsumer):
         room.save()
 
     def calc_time(self, room):
-        if not room.game_iniciado:
+        if room and not room.game_iniciado:
             limit_time = 420
             minutes = timezone.now() - room.created_at
             total_seconds = limit_time - minutes.total_seconds()
@@ -52,6 +53,8 @@ class GlobalsConsumer(WebsocketConsumer):
             return 'Iniciado'
 
     def regressive_time(self, event):
+        if not self.bingo:
+            self.getInfosBingo()
         comeco_vip = self.calc_time(self.room_vip)
         comeco_gratis = self.calc_time(self.room_gratis)
         self.send(json.dumps({'key': 'manager.regressive_vip', 'value': comeco_vip}))
@@ -76,12 +79,17 @@ class GlobalsConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        #self.channel_layer.group_discard(self.channel_name, 'globals')
-        self.close()
+        self.channel_layer.group_discard(self.channel_name, 'globals')
+        # self.close()
 
     def atualizar_room(self, event):
-        print("atualizar_room")
-        self.send(json.dumps({'key': 'manager.att_room'}))
+        print('atualizar_room')
+        self.send(json.dumps({'key': 'manager.att_room', 'value': event['room']}))
+
+    def reload_bingo(self, event):
+        t = MyTread()
+        t.start()
+        self.send(json.dumps({'key': 'manager.att_bingo', 'value': event['bingo']}))
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
@@ -100,10 +108,10 @@ class GlobalsConsumer(WebsocketConsumer):
 def pos_save(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        print("Receiver")
         async_to_sync(channel_layer.group_send)(
             'globals',
             {
-                'type': "atualizar.room",
+                'type': "reload.bingo",
+                 'bingo': BingoSerializer(instance=instance).data
             }
         )

@@ -6,6 +6,10 @@ from apps.card.models import CardBingo
 from apps.core.models import Bingo, Room
 from apps.core.serializers import BingoSerializer, RoomSerializer
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+import json
 
 class BingoViewSet(viewsets.ModelViewSet):
     queryset = Bingo.objects.all()
@@ -35,6 +39,16 @@ class RoomViewSet(viewsets.ModelViewSet):
         room.users.remove(user)
         RoomSerializer(instance=room).data
 
+    def atualizar_rooms(self, room):
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'globals',
+            {
+                'type': "atualizar.room",
+                'room':  RoomSerializer(instance=room).data
+            }
+        )
+
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
@@ -54,8 +68,14 @@ class RoomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         if room.is_pode_entrar(card=card):
+            before_users = room.users.all()
+            atualizar = request.user not in before_users
+            print(atualizar)
             room.users.add(request.user)
             RoomSerializer(instance=room).data
+
+            if atualizar:
+                self.atualizar_rooms(room)
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
             # self.remover_user(room=room, user=request.user)
