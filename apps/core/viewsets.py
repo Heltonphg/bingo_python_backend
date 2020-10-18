@@ -79,5 +79,5 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
             # self.remover_user(room=room, user=request.user)
-            return Response({'error': {'message': "Você não tem permissão para entrar nessa sala!"}},
+            return Response({'error': {'message': "Acesso negado, pois você já está em uma sala. Aguarde a próxima rodada!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
