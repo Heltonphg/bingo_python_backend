@@ -7,6 +7,6 @@ from apps.core.gameconsumers import GameConsumer
 application = ProtocolTypeRouter({
     "websocket": URLRouter([
         url(r'auth/(?P<user_id>\w+)/$', GlobalsConsumer),
-        url(r'game/(?P<user_id>\w+)/$', GameConsumer),
+        url(r'game/(?P<user_id>\w+)/(?P<room_id>\w+)/$', GameConsumer),
     ])
 })

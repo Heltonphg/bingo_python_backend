@@ -11,6 +11,7 @@ class GameConsumer(WebsocketConsumer):
 
     def connect(self):
         id = self.scope['url_route']['kwargs']['user_id']
+        room_id = self.scope['url_route']['kwargs']['room_id']
         self.user_game = User.objects.filter(pk=id).first()
 
         if not self.user_game:
@@ -25,4 +26,4 @@ class GameConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
         if request_dict['key'] == 'user.game':
-            print('o usuário {} se conectou na sala'.format(request_dict['value']['nome']))
+            print('o usuário {} se conectou na sala {}'.format(request_dict['value']['nome'],request_dict['value']['room']))
