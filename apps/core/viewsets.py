@@ -70,7 +70,6 @@ class RoomViewSet(viewsets.ModelViewSet):
         if room.is_pode_entrar(card=card):
             before_users = room.users.all()
             atualizar = request.user not in before_users
-            print(atualizar)
             room.users.add(request.user)
             RoomSerializer(instance=room).data
 
