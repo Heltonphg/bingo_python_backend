@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,11 +10,16 @@ from apps.core.serializers import BingoSerializer, RoomSerializer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-import json
 
 class BingoViewSet(viewsets.ModelViewSet):
     queryset = Bingo.objects.all()
     serializer_class = BingoSerializer
+
+    @action(methods=['GET'], detail=False)
+    def buscar_bingo_prox(self, request):
+        bingo = Bingo.objects.filter(is_prox_stack=True).first()
+        serializer = BingoSerializer(instance=bingo).data
+        return Response(serializer, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False)
     def buscar_bingo_ativo(self, request):
@@ -49,6 +55,7 @@ class RoomViewSet(viewsets.ModelViewSet):
             }
         )
 
+
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
@@ -64,7 +71,7 @@ class RoomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         if not card and room.game_iniciado == True and request.user not in room.users.all():
-            return Response({'error': {'message': "Infelizmente, você não chegou a tempo. Aguarde a próxima rodada!"}},
+            return Response({'error': {'message': "Infelizmente, você não chegou a tempo. Deseja entrar na próxima sala?"}},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if room.is_pode_entrar(card=card):
@@ -78,5 +85,34 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
             # self.remover_user(room=room, user=request.user)
-            return Response({'error': {'message': "Acesso negado, pois você já está em uma sala. Aguarde a próxima rodada!"}},
+            return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
+
+
+    @action(methods=['post'], detail=True)
+    def entrar_prox_room(self, request, pk):
+        card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
+        room = Room.objects.filter(id=pk).first()
+        print('Tem cartela pra proxima partida:?', card)
+
+        if not card:
+            return Response({'error': {'message': "Escolha um cartelão para entrar na sala."}},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if room.is_pode_entrar(card=card):
+            room.users.add(request.user)
+            RoomSerializer(instance=room).data
+            return Response("Acesso permitido", status=status.HTTP_201_CREATED)
+
+    @action(methods=['post'], detail=False)
+    def criar_prox_bingo(self, request):
+        bingo = Bingo.objects.filter(is_prox_stack=True,is_activated=False).first()
+        if not bingo:
+            with transaction.atomic():
+                serializer = BingoSerializer(data={
+                    'name': 'Sala'
+                })
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
