@@ -102,6 +102,9 @@ class RoomViewSet(viewsets.ModelViewSet):
             room.users.add(request.user)
             RoomSerializer(instance=room).data
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
+                            status=status.HTTP_401_UNAUTHORIZED)
 
     @action(methods=['post'], detail=False)
     def criar_prox_bingo(self, request):
