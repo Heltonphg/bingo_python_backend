@@ -84,7 +84,6 @@ class RoomViewSet(viewsets.ModelViewSet):
                 self.atualizar_rooms(room)
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
-            # self.remover_user(room=room, user=request.user)
             return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
 
@@ -101,6 +100,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         if room.is_pode_entrar(card=card):
             room.users.add(request.user)
             RoomSerializer(instance=room).data
+            self.atualizar_rooms(room)
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
             return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
@@ -108,14 +108,12 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False)
     def criar_prox_bingo(self, request):
-        bingo = Bingo.objects.filter(is_prox_stack=True,is_activated=False).first()
-        if not bingo:
-            with transaction.atomic():
-                serializer = BingoSerializer(data={
-                    'name': 'Sala'
-                })
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        with transaction.atomic():
+            serializer = BingoSerializer(data={
+                'name': 'Sala'
+            })
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

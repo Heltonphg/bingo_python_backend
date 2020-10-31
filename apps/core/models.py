@@ -1,5 +1,5 @@
 from django.db import models, transaction
-
+from rest_framework import serializers
 
 class Bingo(models.Model):
     name = models.CharField(max_length=150)
@@ -10,12 +10,15 @@ class Bingo(models.Model):
     def save(self, *args, **kwargs):
         if Bingo.objects.filter(is_activated=True).first():
             if not self.pk:
-                with transaction.atomic():
-                    self.is_activated = False
-                    self.is_prox_stack = True
-                    super(Bingo, self).save(*args, **kwargs)
-                    Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='Vip', value_card=7)
-                    Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='Grátis', value_card=0)
+                if Bingo.objects.filter(is_prox_stack=True).first():
+                    raise serializers.ValidationError('O próximo bingo já foi criado')
+                else:
+                    with transaction.atomic():
+                        self.is_activated = False
+                        self.is_prox_stack = True
+                        super(Bingo, self).save(*args, **kwargs)
+                        Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='Vip', value_card=7)
+                        Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='Grátis', value_card=0)
             else:
                 super(Bingo, self).save(*args, **kwargs)
         else:

@@ -81,7 +81,6 @@ class GlobalsConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         self.channel_layer.group_discard(self.channel_name, 'globals')
-        # self.close()
 
     def atualizar_room(self, event):
         print('atualizar_room')
@@ -90,7 +89,8 @@ class GlobalsConsumer(WebsocketConsumer):
     def reload_bingo(self, event):
         t = MyTread()
         t.start()
-        self.send(json.dumps({'key': 'manager.att_bingo', 'value': event['bingo']}))
+        bingo = Bingo.objects.filter(id=event['bingo']['id']).first()
+        self.send(json.dumps({'key': 'manager.att_bingo', 'value': BingoSerializer(instance=bingo).data}))
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
