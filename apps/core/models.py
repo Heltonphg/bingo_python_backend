@@ -1,5 +1,7 @@
 from django.db import models, transaction
 from rest_framework import serializers
+from django.contrib.postgres.fields import JSONField
+
 
 class Bingo(models.Model):
     name = models.CharField(max_length=150)
@@ -39,11 +41,40 @@ class Room(models.Model):
     bingo = models.ForeignKey(to='Bingo', related_name="rooms", on_delete=models.CASCADE, blank=True, null=True)
     users = models.ManyToManyField(to='auth_user.User', related_name="rooms", blank=True, default=list)
     type = models.CharField(max_length=10, choices=TYPES)
-    minumum_quantity = models.IntegerField()
-    attempts = models.IntegerField(default=3)
     game_iniciado = models.BooleanField(default=False)
-    closed = models.BooleanField(default=False)
     value_card = models.FloatField()
+    minumum_quantity = models.IntegerField()
+    sorted_numbers = JSONField(default=[
+        {'value': 1, 'sorted': False},
+        {'value': 2, 'sorted': False},
+        {'value': 3, 'sorted': False},
+        {'value': 4, 'sorted': False},
+        {'value': 5, 'sorted': False},
+        {'value': 6, 'sorted': False},
+        {'value': 7, 'sorted': False},
+        {'value': 8, 'sorted': False},
+        {'value': 9, 'sorted': False},
+        {'value': 10, 'sorted': False},
+        {'value': 11, 'sorted': False},
+        {'value': 12, 'sorted': False},
+        {'value': 13, 'sorted': False},
+        {'value': 14, 'sorted': False},
+        {'value': 15, 'sorted': False},
+        {'value': 16, 'sorted': False},
+        {'value': 17, 'sorted': False},
+        {'value': 18, 'sorted': False},
+        {'value': 19, 'sorted': False},
+        {'value': 20, 'sorted': False},
+        {'value': 21, 'sorted': False},
+        {'value': 22, 'sorted': False},
+        {'value': 23, 'sorted': False},
+        {'value': 24, 'sorted': False},
+        {'value': 25, 'sorted': False},
+    ])
+
+    finalized = models.BooleanField(default=False)
+    attempts = models.IntegerField(default=3)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

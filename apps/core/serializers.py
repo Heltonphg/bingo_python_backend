@@ -12,7 +12,7 @@ class RoomSerializer(serializers.ModelSerializer):
                   'valor_premio','value_card', 'game_iniciado',
                   'minumum_quantity',
                   'attempts',
-                  'closed',
+                  'finalized',
                   'created_at',
                   'updated_at'
                   )
