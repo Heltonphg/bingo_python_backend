@@ -26,21 +26,41 @@ class GameConsumer(WebsocketConsumer):
         self.channel_layer.group_discard(self.channel_name, self.group)
 
     def sort_ball(self, event):
-        self.send(json.dumps({'key': 'game.sort', 'value': '{}'.format(randrange(0, 90))}))
+        self.send_att_warning(event['valor'])
+        self.send(json.dumps({'key': 'game.sort', 'value': '{}'.format(event['valor'])}))
+
+    def get_position_card(self, stone_value):
+        for i, tupla in enumerate(self.cartelao.cartelao['cartela'], start=0):
+            for j, stone in enumerate(tupla, start=0):
+                if stone_value == stone['value']:
+                    return {'i': i, 'j': j}
+
+    def send_att_card(self, stone_value):
+        postion = self.get_position_card(stone_value)
+        if self.cartelao.cartelao['cartela'][postion['i']][postion['j']]['marked'] == True:
+            self.cartelao.cartelao['cartela'][postion['i']][postion['j']]['marked'] = False
+        else:
+            self.cartelao.cartelao['cartela'][postion['i']][postion['j']]['marked'] = True
+        self.send(json.dumps({'key': 'game.att_cartelao', 'value': self.cartelao.cartelao['cartela']}))
+        self.cartelao.save()
+
+    def send_att_warning(self, stone_value):
+        postion = self.get_position_card(str(stone_value))
+        if self.cartelao.cartelao['cartela'][postion['i']][postion['j']]['warning'] == False:
+            self.cartelao.cartelao['cartela'][postion['i']][postion['j']]['warning'] = True
+            self.send(json.dumps({'key': 'game.att_cartelao', 'value': self.cartelao.cartelao['cartela']}))
+            self.cartelao.save()
+        else:
+            pass
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
         if request_dict['key'] == 'user.game':
             print('o usuário {} se conectou na sala {}'.format(request_dict['value']['nome'], self.group))
             if not self.cartelao:
-                self.cartelao = request_dict['value']['cartelao']
-            # tread_ball = TreadBall()
-            # tread_ball.start()
+                self.cartelao = CardBingo.objects.filter(user=self.user_game).first()
+            tread_ball = TreadBall()
+            tread_ball.start()
 
         if request_dict['key'] == 'marker_stone':
-            for i, tupla in enumerate(self.cartelao, start=0):
-                for j, stone in enumerate(tupla, start=0):
-                    if request_dict['value']['object'] == stone:
-                        self.cartelao[i][j]['marked'] = True
-            self.send(json.dumps({'key': 'game.att_cartelao', 'value': self.cartelao}))
-
+           self.send_att_card(request_dict['value']['object']['value'])
