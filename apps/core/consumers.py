@@ -90,6 +90,7 @@ class GlobalsConsumer(WebsocketConsumer):
         t = MyTread()
         t.start()
         bingo = Bingo.objects.filter(id=event['bingo']['id']).first()
+        print(bingo)
         self.send(json.dumps({'key': 'manager.att_bingo', 'value': BingoSerializer(instance=bingo).data}))
 
     def receive(self, text_data=None, bytes_data=None):
