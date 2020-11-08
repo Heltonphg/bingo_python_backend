@@ -18,10 +18,13 @@ class GameConsumer(WebsocketConsumer):
     def connect(self):
         id = self.scope['url_route']['kwargs']['user_id']
         self.group = self.scope['url_route']['kwargs']['room_id']
+
         self.user_game = User.objects.filter(pk=id).first()
         self.room = Room.objects.filter(pk=self.group).first()
+
         if not self.user_game:
             self.close()
+
         async_to_sync(self.channel_layer.group_add)(self.group, self.channel_name)
         self.accept()
 
@@ -29,8 +32,8 @@ class GameConsumer(WebsocketConsumer):
         self.channel_layer.group_discard(self.channel_name, self.group)
 
     def sort_ball(self, event):
-        self.send_att_warning(event['valor'])
-        self.send(json.dumps({'key': 'game.sort', 'value': '{}'.format(event['valor'])}))
+        self.send_att_warning(event['value'])
+        self.send(json.dumps({'key': 'game.sort', 'value': '{}'.format(event['value'])}))
 
     def get_position_card(self, stone_value):
         for i, tupla in enumerate(self.cartelao.cartelao['cartela'], start=0):
@@ -66,4 +69,4 @@ class GameConsumer(WebsocketConsumer):
             tread_ball.start()
 
         if request_dict['key'] == 'marker_stone':
-           self.send_att_card(request_dict['value']['object']['value'])
+            self.send_att_card(request_dict['value']['object']['value'])

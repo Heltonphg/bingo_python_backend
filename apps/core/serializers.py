@@ -13,6 +13,7 @@ class RoomSerializer(serializers.ModelSerializer):
                   'minumum_quantity',
                   'attempts',
                   'finalized',
+                  'sorted_numbers',
                   'created_at',
                   'updated_at'
                   )
