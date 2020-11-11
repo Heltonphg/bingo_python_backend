@@ -14,7 +14,7 @@ class TreadBall(Thread):
 
     def __init__(self, group_name, room):
         Thread.__init__(self)
-        self.group_name = group_name
+        self.group_name = str(group_name)
         self.room = room
         self.sorted_numbers = room.sorted_numbers
 
@@ -28,6 +28,7 @@ class TreadBall(Thread):
             sys.stdout.flush()
             time.sleep(15)
             stone_sorted = self.stoneSorted()
+            print(stone_sorted['stone'])
             stone_sorted['stone']['sorted'] = True
             self.room.sorted_numbers[stone_sorted['position']] = stone_sorted['stone']
             self.room.save()

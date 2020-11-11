@@ -2,7 +2,6 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-from random import randrange
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
 from apps.core.models import Room
@@ -56,8 +55,7 @@ class GameConsumer(WebsocketConsumer):
             self.cartelao.cartelao['cartela'][postion['i']][postion['j']]['warning'] = True
             self.send(json.dumps({'key': 'game.att_cartelao', 'value': self.cartelao.cartelao['cartela']}))
             self.cartelao.save()
-        else:
-            pass
+
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
@@ -65,8 +63,6 @@ class GameConsumer(WebsocketConsumer):
             print('o usuário {} se conectou na sala {}'.format(request_dict['value']['nome'], self.group))
             if not self.cartelao:
                 self.cartelao = CardBingo.objects.filter(user=self.user_game).first()
-            tread_ball = TreadBall(group_name=self.group, room=self.room)
-            tread_ball.start()
 
         if request_dict['key'] == 'marker_stone':
             self.send_att_card(request_dict['value']['object']['value'])

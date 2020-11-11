@@ -1,17 +1,14 @@
 import json
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from channels.layers import get_channel_layer
 import math
 
 from django.utils import timezone
 
 from apps.auth_user.models import User
 from apps.core.models import Bingo
-from apps.core.serializers import RoomSerializer, BingoSerializer
+from apps.core.serializers import BingoSerializer
 from apps.core.tread import MyTread
 
 
@@ -85,8 +82,6 @@ class GlobalsConsumer(WebsocketConsumer):
         self.send(json.dumps({'key': 'manager.att_room', 'value': event['room']}))
 
     def reload_bingo(self, event):
-        t = MyTread()
-        t.start()
         bingo = Bingo.objects.filter(id=event['bingo']['id']).first()
         self.send(json.dumps({'key': 'manager.att_bingo', 'value': BingoSerializer(instance=bingo).data}))
 
@@ -101,16 +96,3 @@ class GlobalsConsumer(WebsocketConsumer):
 
         if request_dict['key'] == 'log':
             print(request_dict['value']['message'])
-
-
-@receiver(post_save, sender=Bingo)
-def pos_save(sender, instance, created, **kwargs):
-    if created:
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'globals',
-            {
-                'type': "reload.bingo",
-                 'bingo': BingoSerializer(instance=instance).data
-            }
-        )

@@ -3,12 +3,17 @@ from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
 from apps.card.models import CardBingo
 from apps.core.models import Bingo, Room
 from apps.core.serializers import BingoSerializer, RoomSerializer
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+
+from apps.core.tread import MyTread
 
 
 class BingoViewSet(viewsets.ModelViewSet):
@@ -36,6 +41,20 @@ class BingoViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @receiver(post_save, sender=Bingo)
+    def pos_save(sender, instance, created, **kwargs):
+        if created:
+            t = MyTread()
+            t.start()
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                'globals',
+                {
+                    'type': "reload.bingo",
+                    'bingo': BingoSerializer(instance=instance).data
+                }
+            )
+
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
@@ -51,10 +70,9 @@ class RoomViewSet(viewsets.ModelViewSet):
             'globals',
             {
                 'type': "atualizar.room",
-                'room':  RoomSerializer(instance=room).data
+                'room': RoomSerializer(instance=room).data
             }
         )
-
 
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
@@ -71,8 +89,9 @@ class RoomViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         if not card and room.game_iniciado == True and request.user not in room.users.all():
-            return Response({'error': {'message': "Infelizmente, você não chegou a tempo. Deseja entrar na próxima sala?"}},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': {'message': "Infelizmente, você não chegou a tempo. Deseja entrar na próxima sala?"}},
+                status=status.HTTP_400_BAD_REQUEST)
 
         if room.is_pode_entrar(card=card):
             before_users = room.users.all()
@@ -86,7 +105,6 @@ class RoomViewSet(viewsets.ModelViewSet):
         else:
             return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
                             status=status.HTTP_401_UNAUTHORIZED)
-
 
     @action(methods=['post'], detail=True)
     def entrar_prox_room(self, request, pk):
@@ -115,5 +133,3 @@ class RoomViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
