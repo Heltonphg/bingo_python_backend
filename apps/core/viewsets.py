@@ -1,5 +1,5 @@
 from django.db import transaction
-from rest_framework import viewsets, status, serializers
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -13,7 +13,7 @@ from apps.core.serializers import BingoSerializer, RoomSerializer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-from apps.core.tread import MyTread
+from apps.core.tread import ThredRegressive
 
 
 class BingoViewSet(viewsets.ModelViewSet):
@@ -44,8 +44,8 @@ class BingoViewSet(viewsets.ModelViewSet):
     @receiver(post_save, sender=Bingo)
     def pos_save(sender, instance, created, **kwargs):
         if created:
-            t = MyTread()
-            t.start()
+            thredRegressive = ThredRegressive()
+            thredRegressive.start()
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 'globals',

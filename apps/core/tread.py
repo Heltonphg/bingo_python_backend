@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync
 GLOBAL_CHANNEL_LAYER = get_channel_layer()
 
 
-class MyTread(Thread):
+class ThredRegressive(Thread):
     def run(self) -> None:
         while True:
             async_to_sync(GLOBAL_CHANNEL_LAYER.group_send)(

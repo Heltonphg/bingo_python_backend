@@ -7,7 +7,7 @@ import random
 GLOBAL_CHANNEL_LAYER = get_channel_layer()
 
 
-class TreadBall(Thread):
+class ThreadBall(Thread):
     group_name = None
     room = None
     sorted_numbers = []
@@ -28,7 +28,6 @@ class TreadBall(Thread):
             sys.stdout.flush()
             time.sleep(15)
             stone_sorted = self.stoneSorted()
-            print(stone_sorted['stone'])
             stone_sorted['stone']['sorted'] = True
             self.room.sorted_numbers[stone_sorted['position']] = stone_sorted['stone']
             self.room.save()

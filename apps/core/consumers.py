@@ -9,7 +9,7 @@ from django.utils import timezone
 from apps.auth_user.models import User
 from apps.core.models import Bingo
 from apps.core.serializers import BingoSerializer
-from apps.core.tread import MyTread
+from apps.core.tread import ThredRegressive
 
 
 class GlobalsConsumer(WebsocketConsumer):
@@ -91,8 +91,8 @@ class GlobalsConsumer(WebsocketConsumer):
             print('o usuário {} se conectou'.format(request_dict['value']['nome']))
             self.send(json.dumps({'key': 'manager.verificarDispatch', 'value': ''}))
             self.getInfosBingo()
-            t = MyTread()
-            t.start()
+            thredRegressive = ThredRegressive()
+            thredRegressive.start()
 
         if request_dict['key'] == 'log':
             print(request_dict['value']['message'])

@@ -5,7 +5,6 @@ from asgiref.sync import async_to_sync
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
 from apps.core.models import Room
-from apps.core.treadball import TreadBall
 
 
 class GameConsumer(WebsocketConsumer):
