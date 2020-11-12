@@ -13,6 +13,7 @@ from apps.core.serializers import BingoSerializer, RoomSerializer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from apps.core.thred_iniciar import ThredVerifica
 from apps.core.tread import ThredRegressive
 
 
@@ -46,6 +47,8 @@ class BingoViewSet(viewsets.ModelViewSet):
         if created:
             thredRegressive = ThredRegressive()
             thredRegressive.start()
+            verifica = ThredVerifica()
+            verifica.start()
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 'globals',

@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync
 from apps.auth_user.models import User
 from apps.card.models import CardBingo
 from apps.core.models import Room
+from apps.core.treadball import ThreadBall
 
 
 class GameConsumer(WebsocketConsumer):
@@ -62,6 +63,8 @@ class GameConsumer(WebsocketConsumer):
             print('o usuário {} se conectou na sala {}'.format(request_dict['value']['nome'], self.group))
             if not self.cartelao:
                 self.cartelao = CardBingo.objects.filter(user=self.user_game).first()
+            thredBall = ThreadBall(group_name=self.room.id, room=self.room)
+            thredBall.start()
 
         if request_dict['key'] == 'marker_stone':
             self.send_att_card(request_dict['value']['object']['value'])

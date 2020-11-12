@@ -26,7 +26,7 @@ class GlobalsConsumer(WebsocketConsumer):
 
     def calc_time(self, room):
         if room and not room.game_iniciado:
-            limit_time = 420
+            limit_time = 50
             minutes = timezone.now() - room.created_at
             total_seconds = limit_time - minutes.total_seconds()
             if total_seconds <= 0:
