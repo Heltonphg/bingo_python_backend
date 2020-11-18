@@ -11,7 +11,7 @@ class ThreadBall(Thread):
     group_name = None
     room = None
     sorted_numbers = []
-    max_randit = len(sorted_numbers)-1
+    kill = False
 
     def __init__(self, group_name, room):
         print(group_name,room)
@@ -21,15 +21,18 @@ class ThreadBall(Thread):
         self.sorted_numbers = room.sorted_numbers
 
     def stoneSorted(self):
-        stone_sorted = random.randint(0, self.max_randit)
+        stone_sorted = random.randint(0, len(self.sorted_numbers)-1)
         stone = self.sorted_numbers[stone_sorted]
         return {'stone': stone, 'position': stone_sorted}
 
     def run(self) -> None:
-        has_numbers = True
-        while has_numbers:
+        self.kill = False
+        while not self.kill:
+            if self.room.finalized == True:
+                print("Bug em Encerrar-----------")
+                self.kill = True
             sys.stdout.flush()
-            time.sleep(10)
+            time.sleep(20)
             stone_sorted = self.stoneSorted()
             stone_sorted['stone']['sorted'] = True
             self.room.sorted_numbers[stone_sorted['position']] = stone_sorted['stone']
@@ -39,12 +42,12 @@ class ThreadBall(Thread):
                     new_numbers.append(stone)
             self.sorted_numbers = new_numbers
             self.room.sorted_numbers = new_numbers
-            self.max_randit = len(self.sorted_numbers)-1
             self.room.save()
             if len(self.sorted_numbers) == 0:
-                has_numbers = False
+                self.kill = True
 
             async_to_sync(GLOBAL_CHANNEL_LAYER.group_send)(
                 self.group_name,
                 {'type': "sort.ball", 'value': stone_sorted['stone']['value']}
             )
+
