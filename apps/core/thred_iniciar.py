@@ -9,6 +9,7 @@ GLOBAL_CHANNEL_LAYER = get_channel_layer()
 
 class ThredVerifica(Thread):
     def run(self) -> None:
+        print("Verificando se iniciou")
         vip = False
         gratis = False
         while True:
@@ -28,4 +29,4 @@ class ThredVerifica(Thread):
             else:
                 pass
             sys.stdout.flush()
-            time.sleep(10)
+            time.sleep(5)

@@ -44,7 +44,6 @@ class GameConsumer(WebsocketConsumer):
             if stone['value'] != '*' and stone['warning'] == True:
                 counter_warning +=1
         if counter_warning <=4:
-            print('qtt: ', counter_warning)
             self.send_att_warning(event['value'])
             self.send(json.dumps({'key': 'game.sortspeaker', 'value': '{}'.format(event['value'])}))
         else:
@@ -76,6 +75,7 @@ class GameConsumer(WebsocketConsumer):
             if self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] == True:
                 self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] = False
             else:
+                print("OQ RETORNA:", self.is_present_in_sorted_numbers(stone_marker=self.cartelao.cartelao['cartela'][position['i']][position['j']]))
                 if self.is_present_in_sorted_numbers(stone_marker=self.cartelao.cartelao['cartela'][position['i']][position['j']]):
                     self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] = True
                 else:

@@ -47,8 +47,8 @@ class BingoViewSet(viewsets.ModelViewSet):
         if created:
             thredRegressive = ThredRegressive()
             thredRegressive.start()
-            verifica = ThredVerifica()
-            verifica.start()
+            # verifica = ThredVerifica()
+            # verifica.start()
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 'globals',

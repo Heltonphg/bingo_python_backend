@@ -5,7 +5,7 @@ from apps.auth_user.models import User
 class UserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields =('id', 'email', 'full_name', 'nick_name', 'avatar', 'phone')
+        fields =('id', 'email', 'full_name', 'nick_name', 'avatar', 'phone', 'sex')
 
 class UserAuthSerializer(serializers.ModelSerializer):
     cards = serializers.SerializerMethodField()
