@@ -106,8 +106,8 @@ class GameConsumer(WebsocketConsumer):
             print('o usuário {} se conectou na sala {}'.format(request_dict['value']['nome'], self.group))
             if not self.cartelao:
                 self.atualizar_cartelao()
-            thredBall = ThreadBall(group_name=self.room.id, room=self.room)
-            thredBall.start()
+            # thredBall = ThreadBall(group_name=self.room.id, room=self.room)
+            # thredBall.start()
 
         if request_dict['key'] == 'marker_stone':
             self.marker_stone_send(request_dict['value']['object']['value'])
