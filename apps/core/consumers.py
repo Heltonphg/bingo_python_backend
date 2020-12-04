@@ -78,14 +78,16 @@ class GlobalsConsumer(WebsocketConsumer):
         self.channel_layer.group_discard(self.channel_name, 'globals')
 
     def atualizar_room(self, event):
-        print('atualizar_room')
         self.send(json.dumps({'key': 'manager.att_room', 'value': event['room']}))
+
+    def atualizar_room_prox(self, event):
+        print("aquiiiii")
+        self.send(json.dumps({'key': 'manager.att_room_prox'}))
 
     def reload_bingo(self, event):
         bingo = Bingo.objects.filter(id=event['bingo']['id']).first()
         if not bingo.is_prox_stack:
             self.send(json.dumps({'key': 'manager.att_bingo_prox', 'value': BingoSerializer(instance=bingo).data}))
-
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)

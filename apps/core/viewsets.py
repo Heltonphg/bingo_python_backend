@@ -77,6 +77,15 @@ class RoomViewSet(viewsets.ModelViewSet):
             }
         )
 
+    def atualizar_room_prox(self):
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'globals',
+            {
+                'type': "atualizar.room.prox"
+            }
+        )
+
     @action(methods=['post'], detail=True)
     def entrar(self, request, pk):
         card = CardBingo.objects.filter(user=request.user, is_activate=True).first()
@@ -121,7 +130,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         if room.is_pode_entrar(card=card):
             room.users.add(request.user)
             RoomSerializer(instance=room).data
-            self.atualizar_rooms(room)
+            self.atualizar_room_prox()
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
             return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
