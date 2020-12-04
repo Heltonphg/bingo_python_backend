@@ -130,9 +130,13 @@ class RoomViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=False)
     def criar_prox_bingo(self, request):
         with transaction.atomic():
-            serializer = BingoSerializer(data={
-                'name': 'Sala'
-            })
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            prox_bingo = Bingo.objects.filter(is_prox_stack=True, is_activated=False).first()
+            if prox_bingo:
+                return Response(BingoSerializer(instance=prox_bingo).data, status=status.HTTP_200_OK)
+            else:
+                serializer = BingoSerializer(data={
+                    'name': 'Sala'
+                })
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)

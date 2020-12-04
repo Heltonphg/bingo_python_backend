@@ -85,6 +85,9 @@ class GlobalsConsumer(WebsocketConsumer):
         bingo = Bingo.objects.filter(id=event['bingo']['id']).first()
         if not bingo.is_prox_stack:
             self.send(json.dumps({'key': 'manager.att_bingo', 'value': BingoSerializer(instance=bingo).data}))
+        else:
+            self.send(json.dumps({'key': 'manager.att_bingo_prox', 'value': BingoSerializer(instance=bingo).data}))
+
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)
