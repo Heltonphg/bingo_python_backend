@@ -35,15 +35,6 @@ class CardBingoViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
-    @action(methods=['get'], detail=False)
-    def minha_cartela_ativa(self, request):
-        card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
-        if not card:
-            raise serializers.ValidationError('Você não possui nenhuma cartela ativa.')
-        serializer = CardBingoSerializer(instance=card).data
-        return Response(serializer, status=status.HTTP_200_OK)
-
     @action(methods=['get'], detail=False)
     def get_my_cartelao(self, request):
         card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
@@ -51,4 +42,3 @@ class CardBingoViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError('{},você ainda não possui nenhuma cartela.'.format(request.user))
         serializer = MyCartelaoSerializer(instance=card).data
         return Response(serializer, status=status.HTTP_200_OK)
-

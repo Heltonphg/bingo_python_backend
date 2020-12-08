@@ -10,7 +10,6 @@ GLOBAL_CHANNEL_LAYER = get_channel_layer()
 class ThreadBall(Thread):
     group_name = None
     room = None
-    sorted_numbers = []
     kill = False
 
     def __init__(self, group_name, room):
@@ -18,29 +17,31 @@ class ThreadBall(Thread):
         Thread.__init__(self)
         self.group_name = str(group_name)
         self.room = room
-        self.sorted_numbers = room.sorted_numbers
         self.kill = False
 
     def stoneSorted(self):
-        stone_sorted = random.randint(0, len(self.sorted_numbers) - 1)
-        stone = self.sorted_numbers[stone_sorted]
-        return {'stone': stone, 'position': stone_sorted}
+        position_sorted = random.randint(0, len(self.room.sorted_numbers) - 1)
+        stone = self.room.sorted_numbers[position_sorted]
+        return {'stone': stone, 'position': position_sorted}
 
     def run(self) -> None:
         while not self.kill:
             sys.stdout.flush()
-            time.sleep(10)
+            time.sleep(15)
+
             if self.room.finalized == True:
                 print("Tentando encerrar")
                 self.kill = True
+
             stone_sorted = self.stoneSorted()
             stone_sorted['stone']['sorted'] = True
             self.room.sorted_numbers[stone_sorted['position']] = stone_sorted['stone']
+
             new_numbers = list()
-            for stone in self.sorted_numbers:
+            for stone in self.room.sorted_numbers:
                 if stone['sorted'] == False:
                     new_numbers.append(stone)
-            self.sorted_numbers = new_numbers
+
             self.room.sorted_numbers = new_numbers
             self.room.save()
 
