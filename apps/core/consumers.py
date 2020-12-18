@@ -98,6 +98,3 @@ class GlobalsConsumer(WebsocketConsumer):
             self.getInfosBingo()
             thredRegressive = ThredRegressive()
             thredRegressive.start()
-
-        if request_dict['key'] == 'log':
-            print(request_dict['value']['message'])
