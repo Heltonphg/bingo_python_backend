@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.auth_user.models import User
-from apps.auth_user.serializers import UserAuthSerializer, UserSimpleSerializer
+from apps.auth_user.serializers import UserAuthSerializer
 
 
 class UserAuthViewSet(viewsets.ModelViewSet):
