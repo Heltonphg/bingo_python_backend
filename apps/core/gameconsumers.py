@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from apps.auth_user.models import User
-from apps.auth_user.serializers import UserSimpleSerializer
+from apps.auth_user.serializers import UserSimpleSerializer, UserAuthSerializer
 from apps.card.models import CardBingo
 from apps.core.models import Room
 from apps.core.treadball import ThreadBall
@@ -34,7 +34,7 @@ class GameConsumer(WebsocketConsumer):
     def user_win(self, event):
         self.room.finalized = True
         self.room.save()
-        self.send(json.dumps({'key': 'game.user_win', 'value': UserSimpleSerializer(instance=self.user_game).data}))
+        self.send(json.dumps({'key': 'game.user_win', 'value':event['value']}))
 
     def get_position_card(self, stone_value):
         for i, tupla in enumerate(self.cartelao.cartelao['cartela'], start=0):
@@ -68,7 +68,7 @@ class GameConsumer(WebsocketConsumer):
             self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] = True
             async_to_sync(self.channel_layer.group_send)(
                 self.group,
-                {'type': "user.win", 'value': self.cartelao.cartelao['cartela'][position['i']][position['j']]['value']}
+                {'type': "user.win", 'value': UserSimpleSerializer(instance=self.user_game).data}
             )
         else:
             if self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] == True:
