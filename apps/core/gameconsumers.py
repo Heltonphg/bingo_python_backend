@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from apps.auth_user.models import User
-from apps.auth_user.serializers import UserSimpleSerializer, UserAuthSerializer
+from apps.auth_user.serializers import UserSimpleSerializer
 from apps.card.models import CardBingo
 from apps.core.models import Room
 
