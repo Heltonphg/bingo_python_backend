@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
+from apps.core.models import AbstratoModel
 
-class CardBingo(models.Model):
+
+class CardBingo(AbstratoModel):
     user = models.ForeignKey(to='auth_user.User', related_name="cards", on_delete=models.CASCADE)
     room = models.ForeignKey(to='core.Room', related_name="cards", on_delete=models.SET_NULL, blank=True, null=True)
     cartelao = JSONField(null=True, blank=True)

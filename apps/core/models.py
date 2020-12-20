@@ -3,11 +3,17 @@ from rest_framework import serializers
 from django.contrib.postgres.fields import JSONField
 
 
-class Bingo(models.Model):
+class AbstratoModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class Bingo(AbstratoModel):
     name = models.CharField(max_length=150)
     is_activated = models.BooleanField(default=True)
     is_prox_stack = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if Bingo.objects.filter(is_activated=True).first():
@@ -38,7 +44,7 @@ class Bingo(models.Model):
         return '{} - {}'.format(self.name, self.created_at.strftime('%b/%d/%Y (%A) as %H:%M:%S '))
 
 
-class Room(models.Model):
+class Room(AbstratoModel):
     TYPES = [
         ("Vip", "Vip"),
         ("Grátis", "Grátis")
@@ -53,9 +59,6 @@ class Room(models.Model):
 
     finalized = models.BooleanField(default=False)
     attempts = models.IntegerField(default=3)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def is_pode_entrar(self, card):
         return card.is_activate and self.id == card.room_id

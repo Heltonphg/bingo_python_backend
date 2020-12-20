@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 
 from .managers import UserManager
+from ..core.models import AbstratoModel
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -41,3 +42,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+

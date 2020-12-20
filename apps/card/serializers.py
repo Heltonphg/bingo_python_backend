@@ -10,21 +10,23 @@ from apps.core.serializers import RoomSerializer
 
 class CardBingoSerializer(serializers.ModelSerializer):
     room = PrimaryKeyNestedMixin(queryset=Room.objects.all(), serializer=RoomSerializer, required=False,
-                                  allow_empty=True, allow_null=True)
+                                 allow_empty=True, allow_null=True)
     user = PrimaryKeyNestedMixin(queryset=User.objects.all(), serializer=UserSimpleSerializer, required=False,
-                                  allow_empty=True, allow_null=True)
+                                 allow_empty=True, allow_null=True)
     cartelao = serializers.JSONField()
 
     class Meta:
         model = CardBingo
         fields = (
-           'id', 'user', 'room', 'cartelao', 'is_activate', 'price'
+            'id', 'user', 'room', 'cartelao', 'is_activate', 'price'
         )
+
+
 class MyCartelaoSerializer(serializers.ModelSerializer):
     cartelao = serializers.JSONField()
 
     class Meta:
         model = CardBingo
         fields = (
-            'id',  'cartelao',
+            'id', 'cartelao',
         )

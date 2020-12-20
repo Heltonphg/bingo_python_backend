@@ -5,16 +5,18 @@ from apps.auth_user.models import User
 class UserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields =('id', 'email', 'full_name', 'nick_name', 'avatar', 'phone', 'sex')
+        fields = ('id', 'email', 'full_name', 'nick_name', 'avatar', 'phone', 'sex')
+
 
 class UserAuthSerializer(serializers.ModelSerializer):
     cards = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'email', 'full_name', 'password',
-            'nick_name', 'cards',  'cpf',  'phone',
-            'birth_date', 'sex', 'avatar',
-        ]
+                  'nick_name', 'cards', 'cpf', 'phone',
+                  'birth_date', 'sex', 'avatar',
+                  ]
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
