@@ -4,6 +4,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import random
 
+from apps.core.models import Room
+
 GLOBAL_CHANNEL_LAYER = get_channel_layer()
 
 
@@ -27,23 +29,25 @@ class ThreadBall(Thread):
     def run(self) -> None:
         while not self.kill:
             sys.stdout.flush()
-            time.sleep(15)
-
+            time.sleep(10)
+            self.room = Room.objects.filter(pk=self.group_name).first()
             if self.room.finalized == True:
-                print("Tentando encerrar")
+                print("++++++++Tentando encerrar++++++++++++")
                 self.kill = True
 
-            stone_sorted = self.stoneSorted()
-            stone_sorted['stone']['sorted'] = True
-            self.room.sorted_numbers[stone_sorted['position']] = stone_sorted['stone']
+            if self.kill == False:
+                stone_sorted = self.stoneSorted()
+                stone_sorted['stone']['sorted'] = True
+                self.room.sorted_numbers[stone_sorted['position']] = stone_sorted['stone']
 
-            new_numbers = list()
-            for stone in self.room.sorted_numbers:
-                if stone['sorted'] == False:
-                    new_numbers.append(stone)
+                new_numbers = list()
+                for stone in self.room.sorted_numbers:
+                    if stone['sorted'] == False:
+                        new_numbers.append(stone)
 
             self.room.sorted_numbers = new_numbers
             self.room.save()
+
 
             async_to_sync(GLOBAL_CHANNEL_LAYER.group_send)(
                 self.group_name,

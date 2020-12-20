@@ -96,6 +96,10 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response({'error': {'message': "A sala não existe."}},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        if room.finalized == True:
+            return Response({'error': {'message': "Essa sala já foi finalizada, aguarde...!"}},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         if not card and room.game_iniciado == False:
             return Response({'error': {'message': "Escolha um cartelão para entrar na sala."}},
                             status=status.HTTP_400_BAD_REQUEST)
