@@ -35,9 +35,9 @@ class Bingo(AbstratoModel):
                 for i in range(1, 91):
                     listStone.append({'value': i, 'sorted': False})
                 super(Bingo, self).save(*args, **kwargs)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Vip', value_card=7,
+                Room.objects.create(bingo_id=self.id, minumum_quantity=2, type='Vip', value_card=7,
                                     sorted_numbers=listStone)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Grátis', value_card=0,
+                Room.objects.create(bingo_id=self.id, minumum_quantity=2, type='Grátis', value_card=0,
                                     sorted_numbers=listStone)
 
     def __str__(self):

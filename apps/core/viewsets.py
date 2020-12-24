@@ -92,15 +92,11 @@ class RoomViewSet(viewsets.ModelViewSet):
         room = Room.objects.filter(id=pk).first()
         print('Tem cartela:?', card)
 
-        if not room:
-            return Response({'error': {'message': "A sala não existe."}},
+        if room.finalized == True:
+            return Response({'error': {'message': "Essa sala já foi finalizada, aguarde...!"}},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # if room.finalized == True:
-        #     return Response({'error': {'message': "Essa sala já foi finalizada, aguarde...!"}},
-        #                     status=status.HTTP_400_BAD_REQUEST)
-
-        if not card and room.game_iniciado == False:
+        if card is None and room.game_iniciado == False:
             return Response({'error': {'message': "Escolha um cartelão para entrar na sala."}},
                             status=status.HTTP_400_BAD_REQUEST)
 

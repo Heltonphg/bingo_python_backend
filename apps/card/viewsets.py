@@ -23,17 +23,18 @@ class CardBingoViewSet(viewsets.ModelViewSet):
         card = CardBingo.objects.filter(is_activate=True, user=request.user).first()
         if card:
             raise serializers.ValidationError('Você já possui uma cartela ativa.')
-        data = {
-            "user": request.user.pk,
-            "room": pk,
-            "cartelao": request.data['cartelao'],
-            "price": request.data['price']
-        }
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        else:
+            data = {
+                "user": request.user.pk,
+                "room": pk,
+                "cartelao": request.data['cartelao'],
+                "price": request.data['price']
+            }
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(methods=['get'], detail=False)
     def get_my_cartelao(self, request):
