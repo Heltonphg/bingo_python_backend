@@ -29,7 +29,7 @@ class ThreadBall(Thread):
     def run(self) -> None:
         while not self.kill:
             sys.stdout.flush()
-            time.sleep(10)
+            time.sleep(13)
             self.room = Room.objects.filter(pk=self.group_name).first()
             if self.room.finalized == True:
                 print("++++++++Tentando encerrar++++++++++++")

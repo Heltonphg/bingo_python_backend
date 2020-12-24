@@ -23,7 +23,7 @@ class NotificationViewset(viewsets.ModelViewSet):
             try:
                 notification_body = {
                     'contents': {'tr': 'Yeni bildirim', 'en': instance.title},
-                    'include_player_ids': ['2cb74857-2e8a-4c0b-aa79-656e3b6e7f2d'],
+                    'include_player_ids': [str(instance.user.token_notification)],
                 }
                 response = client.send_notification(notification_body)
             except OneSignalHTTPError as e:

@@ -29,6 +29,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    token_notification = models.TextField(default='', null=True, blank=True)
+
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField('staff status', default=False)
@@ -37,7 +39,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def valor_para_receber(self):
         valor = 0
         for win in self.wins.all():
-            print(win)
             valor += win.price
         return valor
 
@@ -71,7 +72,7 @@ class Vitoria(AbstratoModel):
         return "{} ganhou {} ".format(self.user.nick_name, self.price)
 
     def save(self, *args, **kwargs):
-        if Vitoria.objects.filter(user=self.user, room__type="Vip").first():
-            if self.room.type == "Grátis":
-                raise serializers.ValidationError('Esse usuário já venceu no vip')
+        vitorioso = Vitoria.objects.filter(room__type="Vip").first()
+        if vitorioso and vitorioso.user.pk != self.user.pk:
+            raise serializers.ValidationError('Só é permitido um jogador ganahr!')
         return super(Vitoria, self).save(*args, **kwargs)

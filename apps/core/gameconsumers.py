@@ -2,10 +2,13 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-from apps.auth_user.models import User
+from django.db import transaction
+
+from apps.auth_user.models import User, Vitoria
 from apps.auth_user.serializers import UserSimpleSerializer
 from apps.card.models import CardBingo
 from apps.core.models import Room
+from apps.notifications.models import Notifications
 
 
 class GameConsumer(WebsocketConsumer):
@@ -31,10 +34,17 @@ class GameConsumer(WebsocketConsumer):
         self.channel_layer.group_discard(self.channel_name, self.group)
 
     def user_win(self, event):
-        self.room = Room.objects.filter(pk=self.group).first()
-        self.room.finalized = True
-        self.send(json.dumps({'key': 'game.user_win', 'value': event['value']}))
-        self.room.save()
+        with transaction.atomic():
+            self.room = Room.objects.filter(pk=self.group).first()
+            self.room.finalized = True
+            self.send(json.dumps({'key': 'game.user_win', 'value': event['value']}))
+
+            if event['value']['id'] == self.user_game.id:
+                Vitoria.objects.create(user_id=event['value']['id'], room_id=self.group, price=self.room.valor_premio)
+                Notifications.objects.create(user_id=event['value']['id'], title="Parabéns",
+                                             message="Você foi o vencedor do bingo {}. Seu prêmio foi no valor de {}".format(
+                                                 self.group, self.room.valor_premio))
+            self.room.save()
 
     def get_position_card(self, stone_value):
         for i, tupla in enumerate(self.cartelao.cartelao['cartela'], start=0):

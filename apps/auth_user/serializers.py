@@ -16,7 +16,7 @@ class UserAuthSerializer(serializers.ModelSerializer):
         user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
         price = serializers.DecimalField(max_digits=12, decimal_places=2)
 
-    wins = _WinSerializer(many=True)
+    wins = _WinSerializer(many=True,read_only=True)
 
     cards = serializers.SerializerMethodField()
 
@@ -24,7 +24,7 @@ class UserAuthSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'full_name', 'password',
                   'nick_name', 'cards', 'cpf', 'phone',
-                  'birth_date', 'sex', 'avatar', 'wins', 'valor_para_receber',
+                  'birth_date', 'sex', 'avatar', 'wins', 'valor_para_receber', 'token_notification'
                   ]
 
     def create(self, validated_data):
