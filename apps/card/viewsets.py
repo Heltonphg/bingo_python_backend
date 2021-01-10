@@ -3,12 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.card.models import CardBingo
-from apps.card.serializers import CardBingoSerializer, MyCartelaoSerializer
+from apps.card.serializers import CardBingoCadastroSerializer, MyCartelaoSerializer, CardBingoSimpleSerializer
 
 
 class CardBingoViewSet(viewsets.ModelViewSet):
     queryset = CardBingo.objects.all()
-    serializer_class = CardBingoSerializer
+    serializer_class = CardBingoSimpleSerializer
 
     # def destroy(self, request, *args, **kwargs):
     #     instance = self.get_object()
@@ -30,7 +30,7 @@ class CardBingoViewSet(viewsets.ModelViewSet):
                 "cartelao": request.data['cartelao'],
                 "price": request.data['price']
             }
-            serializer = self.get_serializer(data=data)
+            serializer = CardBingoCadastroSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
