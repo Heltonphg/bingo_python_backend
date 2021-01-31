@@ -10,14 +10,6 @@ class CardBingoViewSet(viewsets.ModelViewSet):
     queryset = CardBingo.objects.all()
     serializer_class = CardBingoSimpleSerializer
 
-    # def destroy(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     if not instance.is_activate or instance.price <= 0:
-    #         self.perform_destroy(instance)
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
     @action(methods=['post'], detail=True)
     def cadastrar(self, request, pk):
         card = CardBingo.objects.filter(is_activate=True, user=request.user).first()

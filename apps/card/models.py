@@ -12,4 +12,4 @@ class CardBingo(AbstratoModel):
     price = models.FloatField()
 
     def __str__(self):
-        return "Cartela de {} -{}".format(self.user.nick_name, self.room.type)
+        return '{} - {}'.format(self.user.full_name, self.is_activate)
