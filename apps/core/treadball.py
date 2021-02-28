@@ -15,7 +15,6 @@ class ThreadBall(Thread):
     kill = False
 
     def __init__(self, group_name, room):
-        print(group_name, room)
         Thread.__init__(self)
         self.group_name = str(group_name)
         self.room = room
@@ -29,7 +28,7 @@ class ThreadBall(Thread):
     def run(self) -> None:
         while not self.kill:
             sys.stdout.flush()
-            time.sleep(13)
+            time.sleep(10)
             self.room = Room.objects.filter(pk=self.group_name).first()
             if self.room.finalized == True:
                 print("++++++++Tentando encerrar++++++++++++")
@@ -45,11 +44,9 @@ class ThreadBall(Thread):
                     if stone['sorted'] == False:
                         new_numbers.append(stone)
 
-            self.room.sorted_numbers = new_numbers
-            self.room.save()
-
-
-            async_to_sync(GLOBAL_CHANNEL_LAYER.group_send)(
-                self.group_name,
-                {'type': "sort.ball", 'value': stone_sorted['stone']['value']}
-            )
+                self.room.sorted_numbers = new_numbers
+                self.room.save()
+                async_to_sync(GLOBAL_CHANNEL_LAYER.group_send)(
+                    self.group_name,
+                    {'type': "sort.ball", 'value': stone_sorted['stone']['value']}
+                )

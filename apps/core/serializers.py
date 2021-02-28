@@ -6,6 +6,8 @@ from apps.core.models import Bingo, Room
 class RoomSerializer(serializers.ModelSerializer):
     bingo = serializers.SerializerMethodField()
     users = UserAuthSerializer(many=True)
+    sorted_numbers = serializers.JSONField()
+
 
     class Meta:
         model = Room

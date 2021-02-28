@@ -16,29 +16,15 @@ class Bingo(AbstratoModel):
     is_prox_stack = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        if Bingo.objects.filter(is_activated=True).first():
-            if not self.pk:
-                if Bingo.objects.filter(is_prox_stack=True).first():
-                    raise serializers.ValidationError('O próximo bingo já foi criado')
-                else:
-                    with transaction.atomic():
-                        self.is_activated = False
-                        self.is_prox_stack = True
-                        super(Bingo, self).save(*args, **kwargs)
-                        Room.objects.create(bingo_id=self.id, minumum_quantity=10, type='Vip', value_card=7)
-                        Room.objects.create(bingo_id=self.id, minumum_quantity=5, type='Grátis', value_card=0)
-            else:
-                super(Bingo, self).save(*args, **kwargs)
-        else:
-            with transaction.atomic():
-                listStone = list()
-                for i in range(1, 91):
-                    listStone.append({'value': i, 'sorted': False})
-                super(Bingo, self).save(*args, **kwargs)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Vip', value_card=7,
-                                    sorted_numbers=listStone)
-                Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Grátis', value_card=0,
-                                    sorted_numbers=listStone)
+        with transaction.atomic():
+            listStone = list()
+            for i in range(1, 91):
+                listStone.append({'value': i, 'sorted': False})
+            super(Bingo, self).save(*args, **kwargs)
+            Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Vip', value_card=7,
+                                sorted_numbers=listStone)
+            Room.objects.create(bingo_id=self.id, minumum_quantity=1, type='Grátis', value_card=0,
+                                sorted_numbers=listStone)
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.created_at.strftime('%b/%d/%Y (%A) as %H:%M:%S '))

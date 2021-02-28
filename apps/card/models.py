@@ -6,7 +6,7 @@ from apps.core.models import AbstratoModel
 
 class CardBingo(AbstratoModel):
     user = models.ForeignKey(to='auth_user.User', related_name="cards", on_delete=models.CASCADE)
-    room = models.ForeignKey(to='core.Room', related_name="cards", on_delete=models.SET_NULL, blank=True, null=True)
+    room = models.ForeignKey(to='core.Room', related_name="cards", on_delete=models.CASCADE, blank=True, null=True)
     cartelao = JSONField(null=True, blank=True)
     is_activate = models.BooleanField(default=True)
     price = models.FloatField()

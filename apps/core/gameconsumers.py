@@ -7,7 +7,8 @@ from django.db import transaction
 from apps.auth_user.models import User, Vitoria
 from apps.auth_user.serializers import UserSimpleSerializer
 from apps.card.models import CardBingo
-from apps.core.models import Room
+from apps.core.models import Room, Bingo
+from apps.core.serializers import BingoSerializer
 from apps.notifications.models import Notifications
 
 
@@ -16,6 +17,7 @@ class GameConsumer(WebsocketConsumer):
     cartelao = None
     group = None
     room = None
+    bingo = None
 
     def connect(self):
         id = self.scope['url_route']['kwargs']['user_id']
@@ -23,6 +25,7 @@ class GameConsumer(WebsocketConsumer):
 
         self.user_game = User.objects.filter(pk=id).first()
         self.room = Room.objects.filter(pk=self.group).first()
+        self.bingo = Bingo.objects.filter(is_activated=True).first()
 
         if not self.user_game:
             self.close()
@@ -35,22 +38,51 @@ class GameConsumer(WebsocketConsumer):
 
     def user_win(self, event):
         with transaction.atomic():
-            self.room = Room.objects.filter(pk=self.group).first()
-            self.room.finalized = True
-            self.send(json.dumps({'key': 'game.user_win', 'value': event['value']}))
+            try:
+                self.room = Room.objects.filter(pk=self.group).first()
+                self.room.finalized = True
+                self.cartelao.cartelao = None
+                self.cartelao.is_activate = False
+                self.bingo.is_activated = False
+                #será q vai funcionar?
+                
 
-            if event['value']['id'] == self.user_game.id:
-                Vitoria.objects.create(user_id=event['value']['id'], room_id=self.group, price=self.room.valor_premio)
-                Notifications.objects.create(user_id=event['value']['id'], title="Parabéns",
-                                             message="Você foi o vencedor do bingo {}. Seu prêmio foi no valor de {}".format(
-                                                 self.group, self.room.valor_premio))
-            self.room.save()
+                if event['value']['id'] == self.user_game.id:
+                    if Bingo.objects.filter(is_prox_stack=True).first():
+                        # Instanciar o prox bingo
+                        pass
+                    else:
+                       #Criar Bingo normal
+                        serializer = BingoSerializer(data={
+                            'name': 'Sala'
+                        })
+
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save()
+                        self.send(json.dumps({'key': 'manager.att_bingo', 'value': serializer.data}))
+
+
+                    Vitoria.objects.create(user_id=event['value']['id'], room_id=self.group,
+                                           price=self.room.valor_premio)
+                    Notifications.objects.create(user_id=event['value']['id'], title="Parabéns",
+                                                 message="Você foi o vencedor do bingo {}. Seu prêmio foi no valor de {}".format(
+                                                     self.group, self.room.valor_premio))
+
+                self.cartelao.save()
+                self.room.save()
+                self.bingo.save()
+
+
+                self.send(json.dumps({'key': 'game.user_win', 'value': event['value']}))
+            except:
+                pass
 
     def get_position_card(self, stone_value):
-        for i, tupla in enumerate(self.cartelao.cartelao['cartela'], start=0):
-            for j, stone in enumerate(tupla, start=0):
-                if stone_value == stone['value']:
-                    return {'i': i, 'j': j}
+        if self.cartelao.cartelao['cartela']:
+            for i, tupla in enumerate(self.cartelao.cartelao['cartela'], start=0):
+                for j, stone in enumerate(tupla, start=0):
+                    if stone_value == stone['value']:
+                        return {'i': i, 'j': j}
 
     def sort_ball(self, event):
         position = self.get_position_card(str(event['value']))
@@ -74,7 +106,7 @@ class GameConsumer(WebsocketConsumer):
 
     def marker_stone_send(self, stone_value):
         position = self.get_position_card(stone_value)
-        if self.cartelao.cartelao['cartela'][position['i']][position['j']]['beaten'] == True:
+        if self.cartelao.cartelao['cartela'][position['i']][position['j']]['warning'] == True:
             self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] = True
             async_to_sync(self.channel_layer.group_send)(
                 self.group,
@@ -91,6 +123,10 @@ class GameConsumer(WebsocketConsumer):
                     self.cartelao.cartelao['cartela'][position['i']][position['j']]['marked'] = True
                 else:
                     print('Não pode marcar pq nao foi sorteado')
+                    async_to_sync(self.channel_layer.group_send)(
+                        self.group,
+                        {'type': "user.win", 'value': UserSimpleSerializer(instance=self.user_game).data}
+                    )
         self.cartelao.save()
         self.send(json.dumps({'key': 'game.att_cartelao', 'value': self.cartelao.cartelao['cartela']}))
 
@@ -109,7 +145,8 @@ class GameConsumer(WebsocketConsumer):
             self.send(json.dumps({'key': 'game.att_cartelao', 'value': self.cartelao.cartelao['cartela']}))
 
     def atualizar_cartelao(self):
-        self.cartelao = CardBingo.objects.filter(user=self.user_game).first()
+        self.cartelao = CardBingo.objects.filter(user=self.user_game, is_activate=True).first()
+
 
     def receive(self, text_data=None, bytes_data=None):
         request_dict = json.loads(text_data)

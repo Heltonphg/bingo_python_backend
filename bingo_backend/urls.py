@@ -8,6 +8,8 @@ from rest_framework_jwt.views import obtain_jwt_token
 from apps.account.viewsets import AccountViewSet
 from apps.auth_user.UserViewSet import UserAuthViewSet
 from apps.card.viewsets import CardBingoViewSet
+from apps.core.thred_iniciar import ThredVerifica
+from apps.core.tread import ThredRegressive
 from apps.core.viewsets import BingoViewSet, RoomViewSet
 from apps.notifications.viewsets import NotificationViewset
 
@@ -24,3 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', obtain_jwt_token),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+thredRegressive = ThredRegressive()
+thredRegressive.start()
+
+verifica = ThredVerifica()
+verifica.start()

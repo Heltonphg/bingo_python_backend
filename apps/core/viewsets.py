@@ -45,10 +45,6 @@ class BingoViewSet(viewsets.ModelViewSet):
     @receiver(post_save, sender=Bingo)
     def pos_save(sender, instance, created, **kwargs):
         if created:
-            thredRegressive = ThredRegressive()
-            thredRegressive.start()
-            verifica = ThredVerifica()
-            verifica.start()
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 'globals',
@@ -67,13 +63,12 @@ class RoomViewSet(viewsets.ModelViewSet):
         room.users.remove(user)
         RoomSerializer(instance=room).data
 
-    def atualizar_rooms(self, room):
+    def atualizar_rooms(self):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             'globals',
             {
-                'type': "atualizar.room",
-                'room': RoomSerializer(instance=room).data
+                'type': "atualizar.room"
             }
         )
 
@@ -92,9 +87,9 @@ class RoomViewSet(viewsets.ModelViewSet):
         room = Room.objects.filter(id=pk).first()
         print('Tem cartela:?', card)
 
-        if room.finalized == True:
-            return Response({'error': {'message': "Essa sala já foi finalizada, aguarde...!"}},
-                            status=status.HTTP_400_BAD_REQUEST)
+        # if room.finalized == True:
+        #     return Response({'error': {'message': "Essa sala já foi finalizada, aguarde!"}},
+        #                     status=status.HTTP_400_BAD_REQUEST)
 
         if card is None and room.game_iniciado == False:
             return Response({'error': {'message': "Escolha um cartelão para entrar na sala."}},
@@ -112,7 +107,7 @@ class RoomViewSet(viewsets.ModelViewSet):
             RoomSerializer(instance=room).data
 
             if atualizar:
-                self.atualizar_rooms(room)
+                self.atualizar_rooms()
             return Response("Acesso permitido", status=status.HTTP_201_CREATED)
         else:
             return Response({'error': {'message': "Acesso negado, pois você já está em uma sala!"}},
